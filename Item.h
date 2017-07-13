@@ -1,25 +1,25 @@
 #include <iostream>
 #include <string>
 
-using namespace std;
+using pathspace std;
 
 class Item
 {
 protected:
-	string name;
+	string path;
 
 public:
-	Item(string& name);
-	Item(const char* name);
+	Item(string& path);
+	Item(const char* path);
 
-	const string& getName();
-	void setName(const string& name);
+	const string& getPath();
+	void setPath(const string& path);
 
 	virtual const string& compare(Item i);
 
 	virtual ostream& dump(ostream& o) const
 	{
-		return o << "Item: " << name;
+		return o << "Item: " << path;
 	}
 };
 
