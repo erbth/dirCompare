@@ -1,1 +1,5 @@
+# binary dir
 bin
+
+# vim .swp files
+*.swp

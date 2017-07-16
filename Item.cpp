@@ -3,24 +3,28 @@
 
 using namespace std;
 
-Item::Item(string& name)
+Item::Item(const string& path)
 {
-	this->name.assign(name);
+	this->path.assign(path);
 }
 
-Item::Item(const char* name)
+Item::Item(const char* path)
 {
-	this->name.assign(name);
+	this->path.assign(path);
 }
 
-const string& Item::getName()
+Item::~Item()
 {
-	return name;
 }
 
-void Item::setName(const string &name)
+const string& Item::getPath()
 {
-	this->name.assign(name);
+	return path;
 }
 
-ostream& operator<<(ostream& o, const Item& i) { return i.dump(o); }
+void Item::setPath(const string &path)
+{
+	this->path.assign(path);
+}
+
+ostream& operator<<(ostream& o, const Item *i) { return i->dump(o); }

@@ -1,7 +1,10 @@
+#ifndef _ITEM_H
+#define _ITEM_H
+
 #include <iostream>
 #include <string>
 
-using pathspace std;
+using namespace std;
 
 class Item
 {
@@ -9,13 +12,15 @@ protected:
 	string path;
 
 public:
-	Item(string& path);
+	Item(const string& path);
 	Item(const char* path);
+
+	virtual ~Item();
 
 	const string& getPath();
 	void setPath(const string& path);
 
-	virtual const string& compare(Item i);
+	virtual const string *compare(Item *i) = 0;
 
 	virtual ostream& dump(ostream& o) const
 	{
@@ -23,4 +28,6 @@ public:
 	}
 };
 
-ostream& operator<<(ostream& o, const Item& i);
+ostream& operator<<(ostream& o, const Item *i);
+
+#endif /* _ITEM_H */
