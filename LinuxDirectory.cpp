@@ -9,12 +9,6 @@ LinuxDirectory::LinuxDirectory(const string& path) : Directory(path)
 {
 }
 
-LinuxDirectory::LinuxDirectory(const char* path) : Directory(path)
-{
-	items.push_back(new LinuxFile("test"));
-	items.push_back(new LinuxFile("baum"));
-}
-
 LinuxDirectory::~LinuxDirectory()
 {
 	cout << "LinuxDirectory" << endl;

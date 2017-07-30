@@ -10,10 +10,6 @@ Directory::Directory(const string& path) : Item(path)
 {
 }
 
-Directory::Directory(const char* path) : Item(path)
-{
-}
-
 Directory::~Directory()
 {
 	for (auto i : items)

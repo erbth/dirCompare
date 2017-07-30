@@ -5,18 +5,23 @@
 #include <string>
 #include "File.h"
 #include "Item.h"
+#include "LinuxFileInfo.h"
 
 using namespace std;
 
 class LinuxFile : public File
 {
+protected:
+	int fd;
+
 public:
 	LinuxFile(const string& path);
-	LinuxFile(const char* path);
 
 	virtual ~LinuxFile();
 
 	virtual const string *compare(Item *i) override;
+
+	LinuxFileInfo getFileInfo();
 
 	virtual ostream& dump(ostream& o) const
 	{

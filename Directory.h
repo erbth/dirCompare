@@ -17,13 +17,10 @@ protected:
 
 public:
 	Directory(const string& path);
-	Directory(const char* path);
 
 	virtual ~Directory();
 
 	vector<Item *> *getItems();
-
-	virtual const string *compare(Item *i) = 0;
 
 	virtual ostream& dump(ostream& o) const
 	{

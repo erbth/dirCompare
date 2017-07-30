@@ -13,7 +13,6 @@ protected:
 
 public:
 	Item(const string& path);
-	Item(const char* path);
 
 	virtual ~Item();
 

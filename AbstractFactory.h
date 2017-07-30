@@ -9,10 +9,7 @@ class AbstractFactory
 {
 public:
 	virtual File *createFile(const string& path) = 0;
-	virtual File *createFile(const char* path) = 0;
-
 	virtual Directory *createDirectory(const string& path) = 0;
-	virtual Directory *createDirectory(const char* path) = 0;
 };
 
 #endif /* _ABSTRACT_FACTORY_H */

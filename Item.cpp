@@ -8,11 +8,6 @@ Item::Item(const string& path)
 	this->path.assign(path);
 }
 
-Item::Item(const char* path)
-{
-	this->path.assign(path);
-}
-
 Item::~Item()
 {
 }

@@ -13,7 +13,8 @@ OBJS   = main.o \
 		 Directory.o \
 		 LinuxFile.o \
 		 LinuxDirectory.o \
-		 LinuxFactory.o
+		 LinuxFactory.o \
+		 LinuxFileInfo.o
 
 HEADERS = Item.h \
 		  File.h \
@@ -21,7 +22,10 @@ HEADERS = Item.h \
 		  LinuxFile.h \
 		  LinuxDirectory.h \
 		  AbstractFactory.h \
-		  LinuxFactory.h
+		  LinuxFactory.h \
+		  errno_exception.h \
+		  gp_exception.h \
+		  LinuxFileInfo.h
 
 .PHONY: all
 all: $(TARGET:%=$(OBJDIR)/%)

@@ -11,7 +11,6 @@ class File : public Item
 {
 public:
 	File(const string& path);
-	File(const char* path);
 
 	virtual ~File();
 

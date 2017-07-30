@@ -1,21 +1,19 @@
 #include <iostream>
+#include <memory>
 #include "Item.h"
 #include "LinuxFactory.h"
+#include "LinuxFile.h"
 
 int main()
 {
 	AbstractFactory *f = new LinuxFactory();
 
-	string str("file #1");
+	Item *f1 = f->createFile("Readme");
+	cout << f1 << endl;
 
-	Item *i = f->createFile(str);
-	Item *i2 = f->createDirectory("directory #1");
+	LinuxFile *fl = dynamic_cast<LinuxFile*>(f1);
+	fl->getFileInfo().print_summary(cout);
 
-	cout << i << endl;
-	cout << i2 << endl;
-
-	delete i;
-	delete i2;
-
+	delete f1;
 	delete f;
 }

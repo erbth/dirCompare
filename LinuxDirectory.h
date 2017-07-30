@@ -11,7 +11,6 @@ class LinuxDirectory : public Directory
 {
 public:
 	LinuxDirectory(const string& path);
-	LinuxDirectory(const char* path);
 
 	virtual ~LinuxDirectory() override;
 
