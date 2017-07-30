@@ -1,12 +1,12 @@
 #include <iostream>
 #include <memory>
 #include "Item.h"
-#include "LinuxFactory.h"
+#include "LinuxItemFactory.h"
 #include "LinuxFile.h"
 
 int main()
 {
-	AbstractFactory *f = new LinuxFactory();
+	ItemFactory *f = new LinuxItemFactory();
 
 	Item *f1 = f->createFile("Readme");
 	cout << f1 << endl;

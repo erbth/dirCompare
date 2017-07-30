@@ -13,7 +13,7 @@ OBJS   = main.o \
 		 Directory.o \
 		 LinuxFile.o \
 		 LinuxDirectory.o \
-		 LinuxFactory.o \
+		 LinuxItemFactory.o \
 		 LinuxFileInfo.o
 
 HEADERS = Item.h \
@@ -21,8 +21,8 @@ HEADERS = Item.h \
 		  Directory.h \
 		  LinuxFile.h \
 		  LinuxDirectory.h \
-		  AbstractFactory.h \
-		  LinuxFactory.h \
+		  ItemFactory.h \
+		  LinuxItemFactory.h \
 		  errno_exception.h \
 		  gp_exception.h \
 		  LinuxFileInfo.h

@@ -295,3 +295,56 @@ void LinuxFileInfo::print_summary(ostream& o) const
 	t = system_clock::to_time_t(getC_time());
 	o << "ctime:        " << ctime(&t);
 }
+
+bool LinuxFileInfo::equivalent_to(LinuxFileInfo *f) const
+{
+	if (isSocket() != f->isSocket() ||
+		isLink() != f->isLink() ||
+		isRegularFile() != f->isRegularFile() ||
+		isBlockDevice() != f->isBlockDevice() ||
+		isDirectory() != f->isDirectory() ||
+		isCharacterDevice() != f->isCharacterDevice() ||
+		isFifo() != f->isFifo())
+	{
+		return false;
+	}
+
+	if (isUIDSet() != f->isUIDSet() ||
+		isGIDSet() != f->isGIDSet() ||
+		isSticky() != f->isSticky())
+	{
+		return false;
+	}
+
+	if (getOwnerPermissions() != f->getOwnerPermissions() ||
+		getGroupPermissions() != f->getGroupPermissions() ||
+		getWorldPermissions() != f->getWorldPermissions())
+	{
+		return false;
+	}
+
+	if (getUID() != f->getUID() ||
+		getGID() != f->getGID())
+	{
+		return false;
+	}
+
+	if (getSpecialFileDeviceId() != f->getSpecialFileDeviceId())
+	{
+		return false;
+	}
+
+	if (getSize() != f->getSize())
+	{
+		return false;
+	}
+
+	if (getA_time() != f->getA_time() ||
+		getM_time() != f->getM_time() ||
+		getC_time() != f->getC_time())
+	{
+		return false;
+	}
+
+	return true;
+}

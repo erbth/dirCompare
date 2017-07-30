@@ -91,6 +91,8 @@ public:
 	system_clock::time_point getC_time() const;
 
 	void print_summary(ostream &o) const;
+
+	bool equivalent_to(LinuxFileInfo *f) const;
 };
 
 #endif /* _LINUX_FILE_INFO_H */

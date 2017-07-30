@@ -1,16 +1,16 @@
-#ifndef _LINUX_FACTORY_H
-#define _LINUX_FACTORY_H
+#ifndef _LINUX_ITEM_FACTORY_H
+#define _LINUX_ITEM_FACTORY_H
 
 #include <string>
 #include "File.h"
 #include "Directory.h"
-#include "AbstractFactory.h"
+#include "ItemFactory.h"
 
-class LinuxFactory : public AbstractFactory
+class LinuxItemFactory : public ItemFactory
 {
 public:
 	virtual File *createFile(const string& path) override;
 	virtual Directory *createDirectory(const string& path) override;
 };
 
-#endif /* _LINUX_FACTORY_H */
+#endif /* _LINUX_ITEM_FACTORY_H */

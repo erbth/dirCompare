@@ -3,14 +3,14 @@
 #include "Directory.h"
 #include "LinuxFile.h"
 #include "LinuxDirectory.h"
-#include "LinuxFactory.h"
+#include "LinuxItemFactory.h"
 
-File *LinuxFactory::createFile(const string& path)
+File *LinuxItemFactory::createFile(const string& path)
 {
 	return new LinuxFile(path);
 }
 
-Directory *LinuxFactory::createDirectory(const string& path)
+Directory *LinuxItemFactory::createDirectory(const string& path)
 {
 	return new LinuxDirectory(path);
 }
