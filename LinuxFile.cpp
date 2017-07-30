@@ -43,7 +43,7 @@ LinuxFile::~LinuxFile()
 	cout << "LinuxFile " << path << " closed" << endl;
 }
 
-LinuxFileInfo LinuxFile::getFileInfo()
+LinuxFileInfo LinuxFile::getFileInfo() const
 {
 	struct stat st;
 
@@ -53,9 +53,4 @@ LinuxFileInfo LinuxFile::getFileInfo()
 	}
 
 	return LinuxFileInfo(&st);
-}
-
-const string *LinuxFile::compare(Item *i)
-{
-	return new string("not matching");
 }

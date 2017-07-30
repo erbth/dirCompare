@@ -19,8 +19,6 @@ public:
 	const string& getPath();
 	void setPath(const string& path);
 
-	virtual const string *compare(Item *i) = 0;
-
 	virtual ostream& dump(ostream& o) const
 	{
 		return o << "Item: " << path;

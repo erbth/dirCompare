@@ -14,8 +14,6 @@ public:
 
 	virtual ~LinuxDirectory() override;
 
-	virtual const string *compare(Item *i) override;
-
 	virtual ostream& dump(ostream& o) const
 	{
 		o << "LinuxDirectory: " << path << "\n" <<

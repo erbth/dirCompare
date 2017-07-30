@@ -92,7 +92,7 @@ public:
 
 	void print_summary(ostream &o) const;
 
-	bool equivalent_to(LinuxFileInfo *f) const;
+	bool equivalent_to(LinuxFileInfo &f) const;
 };
 
 #endif /* _LINUX_FILE_INFO_H */

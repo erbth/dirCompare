@@ -14,7 +14,10 @@ OBJS   = main.o \
 		 LinuxFile.o \
 		 LinuxDirectory.o \
 		 LinuxItemFactory.o \
-		 LinuxFileInfo.o
+		 LinuxFileInfo.o \
+		 LinuxSimpleFileComparison.o \
+		 LinuxComparisonFactory.o \
+		 ComparisonContext.o
 
 HEADERS = Item.h \
 		  File.h \
@@ -25,7 +28,13 @@ HEADERS = Item.h \
 		  LinuxItemFactory.h \
 		  errno_exception.h \
 		  gp_exception.h \
-		  LinuxFileInfo.h
+		  LinuxFileInfo.h \
+		  FileComparisonStrategy.h \
+		  LinuxFileComparisonStrategy.h \
+		  LinuxSimpleFileComparison.h \
+		  ComparisonStrategyFactory.h \
+		  LinuxComparisonFactory.h \
+		  ComparisonContext.h
 
 .PHONY: all
 all: $(TARGET:%=$(OBJDIR)/%)

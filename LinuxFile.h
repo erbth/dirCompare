@@ -19,9 +19,7 @@ public:
 
 	virtual ~LinuxFile();
 
-	virtual const string *compare(Item *i) override;
-
-	LinuxFileInfo getFileInfo();
+	LinuxFileInfo getFileInfo() const;
 
 	virtual ostream& dump(ostream& o) const
 	{

@@ -13,8 +13,3 @@ LinuxDirectory::~LinuxDirectory()
 {
 	cout << "LinuxDirectory" << endl;
 }
-
-const string *LinuxDirectory::compare(Item *i)
-{
-	return new string("not matching");
-}
