@@ -4,6 +4,7 @@
 #include "Item.h"
 #include "LinuxItemFactory.h"
 #include "LinuxFile.h"
+#include "LinuxDirectory.h"
 #include "ComparisonContext.h"
 #include "ComparisonStrategyFactory.h"
 #include "LinuxComparisonFactory.h"
@@ -28,6 +29,8 @@ int main()
 
 	ItemFactory *f = new LinuxItemFactory();
 
+
+	/* test file */
 	Item *f1 = f->createFile("test1");
 	cout << endl << f1 << endl;
 
@@ -42,8 +45,19 @@ int main()
 	fl2->getFileInfo().print_summary(cout);
 	cout << endl;
 
-	cout << cc.compare(f1, f2) << endl << endl;
+	cout << cc.compare(shared_ptr<Item>(f1), shared_ptr<Item>(f2)) << endl << endl;
 
+
+	/* test directory */
+	cout << endl;
+	Item *d1 = f->createDirectory("testDir");
+	cout << endl << d1 << endl;
+
+	LinuxDirectory *ld1 = dynamic_cast<LinuxDirectory*>(d1);
+	ld1->getFileInfo().print_summary(cout);
+	cout << endl;
+
+	delete d1;
 	delete f2;
 	delete f1;
 	delete f;

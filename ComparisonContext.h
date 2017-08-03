@@ -1,10 +1,10 @@
 #ifndef _COMPARISON_CONTEXT_H
 #define _COMPARISON_CONTEXT_H
 
-#include <string>
 #include <memory>
 #include "Item.h"
 #include "FileComparisonStrategy.h"
+#include "DirectoryComparisonStrategy.h"
 
 using namespace std;
 
@@ -12,6 +12,7 @@ class ComparisonContext
 {
 private:
 	shared_ptr<FileComparisonStrategy> fileStrategy;
+	shared_ptr<DirectoryComparisonStrategy> dirStrategy;
 
 public:
 	ComparisonContext() : fileStrategy(nullptr) {};
@@ -19,7 +20,12 @@ public:
 	shared_ptr<FileComparisonStrategy> getFileComparisonStrategy() const;
 	void setFileComparisonStrategy(shared_ptr<FileComparisonStrategy> s);
 
-	const string compare(Item *i1, Item *i2) const;
+	shared_ptr<DirectoryComparisonStrategy> getDirectoryComparisonStrategy() const;
+	void setDirectoryComparisonStrategy(shared_ptr<DirectoryComparisonStrategy> s);
+
+	bool compare(
+		shared_ptr<const Item> i1,
+		shared_ptr<const Item> i2) const;
 };
 
 #endif /* _COMPARISON_CONTEXT_H */

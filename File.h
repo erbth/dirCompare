@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include "Item.h"
+#include "Directory.h"
 
 using namespace std;
 
@@ -11,6 +12,7 @@ class File : public Item
 {
 public:
 	File(const string& path);
+	File(const string& path, const Directory* dir);
 
 	virtual ~File();
 

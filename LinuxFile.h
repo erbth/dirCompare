@@ -3,19 +3,29 @@
 
 #include <iostream>
 #include <string>
-#include "File.h"
 #include "Item.h"
+#include "File.h"
+#include "Directory.h"
 #include "LinuxFileInfo.h"
+
+extern "C"
+{
+	#include <stdio.h>
+}
 
 using namespace std;
 
 class LinuxFile : public File
 {
+private:
+	void init();
+
 protected:
-	int fd;
+	FILE* file;
 
 public:
 	LinuxFile(const string& path);
+	LinuxFile(const string& path, const Directory* dir);
 
 	virtual ~LinuxFile();
 

@@ -19,6 +19,11 @@ public:
 		msg = strerror(en);
 	}
 
+	errno_exception(int en, string str)
+	{
+		msg = (str + string(strerror(en))).c_str();
+	}
+
 	virtual const char* what() const throw() override
 	{
 		return msg;

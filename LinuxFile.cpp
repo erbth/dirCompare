@@ -1,10 +1,11 @@
 #include <string>
-#include <exception>
 #include "LinuxFile.h"
-#include "File.h"
 #include "Item.h"
+#include "File.h"
+#include "Directory.h"
 #include "errno_exception.h"
 #include "LinuxFileInfo.h"
+#include "LinuxDirectory.h"
 
 #include <iostream>
 
@@ -21,13 +22,55 @@ using namespace std;
 
 LinuxFile::LinuxFile(const string& path) : File(path)
 {
+	init();
+}
+
+LinuxFile::LinuxFile(const string& path, const Directory* dir) : File(path, dir)
+{
+	init();
+}
+
+void LinuxFile::init()
+{
 	cout << "Trying to open LinuxFile " << path.c_str() << " ..." << endl;
 
-	fd = open(path.c_str(), O_RDONLY);
+	int fd;
+
+	if (directory)
+	{
+		fd = openat(
+			dynamic_cast<const LinuxDirectory*>(directory)->getFd(),
+			path.c_str(),
+			O_RDONLY);
+	}
+	else
+	{
+		fd = open(path.c_str(), O_RDONLY);
+	}
 
 	if (fd < 0)
 	{
-		throw errno_exception(errno);
+		throw errno_exception(
+			errno,
+			"failed to open file " + path + ": ");
+	}
+		
+	/* create FILE stream */
+	file = fdopen(fd, "r");
+
+	if (!file)
+	{
+		if (close(fd) < 0)
+		{
+			throw errno_exception(
+				errno,
+				"fault to close fd, latter caused by error in initialization of file "
+				+ path + ": ");
+		}
+
+		throw errno_exception(
+			errno,
+			"fault to create FILE stream for file: " + path);
 	}
 
 	cout << "LinuxFile " << path << " created" << endl;
@@ -35,7 +78,7 @@ LinuxFile::LinuxFile(const string& path) : File(path)
 
 LinuxFile::~LinuxFile()
 {
-	if (close(fd) < 0)
+	if (fclose(file) < 0)
 	{
 		throw errno_exception(errno);
 	}
@@ -47,9 +90,9 @@ LinuxFileInfo LinuxFile::getFileInfo() const
 {
 	struct stat st;
 
-	if (fstat(fd, &st) < 0)
+	if (fstat(fileno(file), &st) < 0)
 	{
-		throw new errno_exception(errno);
+		throw errno_exception(errno);
 	}
 
 	return LinuxFileInfo(&st);

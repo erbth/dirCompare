@@ -1,16 +1,19 @@
 #include <string>
+#include <memory>
 #include "File.h"
 #include "LinuxFile.h"
 #include "LinuxSimpleFileComparison.h"
 
 using namespace std;
 
-bool LinuxSimpleFileComparison::compare(const File *f1, const File *f2)
+bool LinuxSimpleFileComparison::compare(
+	shared_ptr<const File> f1,
+	shared_ptr<const File> f2) const
 {
-	const LinuxFile *lf1 = dynamic_cast<const LinuxFile*>(f1);
-	const LinuxFile *lf2 = dynamic_cast<const LinuxFile*>(f2);
+	auto lf1 = dynamic_pointer_cast<const LinuxFile>(f1);
+	auto lf2 = dynamic_pointer_cast<const LinuxFile>(f2);
 
-	if (lf1 && lf2)
+	if (lf1 != nullptr && lf2 != nullptr)
 	{
 		LinuxFileInfo info2 = lf2->getFileInfo();
 
@@ -23,7 +26,7 @@ bool LinuxSimpleFileComparison::compare(const File *f1, const File *f2)
 	return false;
 }
 
-const string LinuxSimpleFileComparison::getID()
+const string LinuxSimpleFileComparison::getID() const
 {
 	string v("simple file comparison on Linux, compares only file parameters");
 	return v;

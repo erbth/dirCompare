@@ -6,18 +6,21 @@
 
 using namespace std;
 
+class Directory;
+
 class Item
 {
 protected:
 	string path;
+	const Directory *directory;
 
 public:
 	Item(const string& path);
+	Item(const string& path, const Directory* dir);
 
 	virtual ~Item();
 
 	const string& getPath();
-	void setPath(const string& path);
 
 	virtual ostream& dump(ostream& o) const
 	{

@@ -16,8 +16,10 @@ OBJS   = main.o \
 		 LinuxItemFactory.o \
 		 LinuxFileInfo.o \
 		 LinuxSimpleFileComparison.o \
+		 LinuxSimpleDirectoryComparison.o \
 		 LinuxComparisonFactory.o \
-		 ComparisonContext.o
+		 ComparisonContext.o \
+		 DirectoryComparisonStrategy.o
 
 HEADERS = Item.h \
 		  File.h \
@@ -32,6 +34,9 @@ HEADERS = Item.h \
 		  FileComparisonStrategy.h \
 		  LinuxFileComparisonStrategy.h \
 		  LinuxSimpleFileComparison.h \
+		  DirectoryComparisonStrategy.h \
+		  LinuxDirectoryComparisonStrategy.h \
+		  LinuxSimpleDirectoryComparison.h \
 		  ComparisonStrategyFactory.h \
 		  LinuxComparisonFactory.h \
 		  ComparisonContext.h

@@ -10,17 +10,10 @@ Directory::Directory(const string& path) : Item(path)
 {
 }
 
-Directory::~Directory()
+Directory::Directory(const string& path, const Directory* dir) : Item(path, dir)
 {
-	for (auto i : items)
-	{
-		delete i;
-	}
-
-	cout << "Directory " << path << " deleted." << endl;
 }
 
-vector<Item *> *Directory::getItems()
+Directory::~Directory()
 {
-	return new vector<Item *>(items);
 }
