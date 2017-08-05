@@ -2,6 +2,7 @@
 #define _LINUX_FILE_H
 
 #include <iostream>
+#include <memory>
 #include <string>
 #include "Item.h"
 #include "File.h"
@@ -25,7 +26,7 @@ protected:
 
 public:
 	LinuxFile(const string& path);
-	LinuxFile(const string& path, const Directory* dir);
+	LinuxFile(const string& path, shared_ptr<const Directory> dir);
 
 	virtual ~LinuxFile();
 

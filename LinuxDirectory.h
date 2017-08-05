@@ -2,6 +2,7 @@
 #define _LINUX_DIRECTORY_H
 
 #include <iostream>
+#include <memory>
 #include <string>
 #include <vector>
 #include <memory>
@@ -24,7 +25,7 @@ protected:
 
 public:
 	LinuxDirectory(const string& path);
-	LinuxDirectory(const string& path, const Directory* dir);
+	LinuxDirectory(const string& path, shared_ptr<const Directory> dir);
 
 	virtual ~LinuxDirectory() override;
 

@@ -27,39 +27,53 @@ int main()
 
 	cout << endl;
 
+	auto dirStrategies = csf->createDirStrategies();
+
+	cout << "offered directory comparison strategies:" << endl;
+
+	for (auto s : dirStrategies)
+	{
+		cout << s->getID() << endl;
+	}
+
+	cc.setDirectoryComparisonStrategy(dirStrategies[0]);
+
+	cout << endl;
+
 	ItemFactory *f = new LinuxItemFactory();
 
 
 	/* test file */
-	Item *f1 = f->createFile("test1");
+	/* auto f1 = f->createFile("test1");
 	cout << endl << f1 << endl;
 
-	LinuxFile *fl1 = dynamic_cast<LinuxFile*>(f1);
+	auto fl1 = dynamic_pointer_cast<LinuxFile>(f1);
 	fl1->getFileInfo().print_summary(cout);
 	cout << endl;
 
-	Item *f2 = f->createFile("test2");
+	auto f2 = f->createFile("test2");
 	cout << endl << f2 << endl;
 
-	LinuxFile *fl2 = dynamic_cast<LinuxFile*>(f2);
+	auto fl2 = dynamic_pointer_cast<LinuxFile>(f2);
 	fl2->getFileInfo().print_summary(cout);
 	cout << endl;
 
-	cout << cc.compare(shared_ptr<Item>(f1), shared_ptr<Item>(f2)) << endl << endl;
+	cout << cc.compare(f1, f2) << endl << endl; */
 
 
 	/* test directory */
 	cout << endl;
-	Item *d1 = f->createDirectory("testDir");
-	cout << endl << d1 << endl;
+	auto d1 = f->createDirectory("testDir1");
+	/* cout << endl << d1 << endl; */
 
-	LinuxDirectory *ld1 = dynamic_cast<LinuxDirectory*>(d1);
+	/* auto ld1 = dynamic_pointer_cast<LinuxDirectory>(d1);
 	ld1->getFileInfo().print_summary(cout);
-	cout << endl;
+	cout << endl; */
 
-	delete d1;
-	delete f2;
-	delete f1;
+	auto d2 = f->createDirectory("testDir2");
+
+	cout << cc.compare(d1, d2) << endl;
+
 	delete f;
 	delete csf;
 }

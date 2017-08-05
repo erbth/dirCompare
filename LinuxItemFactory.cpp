@@ -1,3 +1,4 @@
+#include <memory>
 #include <string>
 #include "File.h"
 #include "Directory.h"
@@ -5,12 +6,12 @@
 #include "LinuxDirectory.h"
 #include "LinuxItemFactory.h"
 
-File *LinuxItemFactory::createFile(const string& path)
+shared_ptr<File> LinuxItemFactory::createFile(const string& path)
 {
-	return new LinuxFile(path);
+	return make_shared<LinuxFile>(path);
 }
 
-Directory *LinuxItemFactory::createDirectory(const string& path)
+shared_ptr<Directory> LinuxItemFactory::createDirectory(const string& path)
 {
-	return new LinuxDirectory(path);
+	return make_shared<LinuxDirectory>(path);
 }

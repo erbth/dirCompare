@@ -1,4 +1,5 @@
 #include <iostream>
+#include <memory>
 #include <string>
 #include "Item.h"
 #include "Directory.h"
@@ -11,7 +12,7 @@ Item::Item(const string& path)
 	directory = nullptr;
 }
 
-Item::Item(const string& path, const Directory* dir)
+Item::Item(const string& path, shared_ptr<const Directory> dir)
 {
 	this->path = path;
 	directory = dir;

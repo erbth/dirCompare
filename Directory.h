@@ -2,6 +2,7 @@
 #define _DIRECTORY_H
 
 #include <iostream>
+#include <memory>
 #include <string>
 #include <vector>
 #include <memory>
@@ -9,11 +10,11 @@
 
 using namespace std;
 
-class Directory : public Item
+class Directory : public Item, public enable_shared_from_this<Directory>
 {
 public:
 	Directory(const string& path);
-	Directory(const string& path, const Directory* dir);
+	Directory(const string& path, shared_ptr<const Directory> dir);
 
 	virtual ~Directory();
 

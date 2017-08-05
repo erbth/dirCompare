@@ -8,7 +8,7 @@
 class ComparisonContext;
 
 class DirectoryComparisonStrategy :
-	enable_shared_from_this<DirectoryComparisonStrategy>
+	public enable_shared_from_this<DirectoryComparisonStrategy>
 {
 protected:
 	const ComparisonContext* comparisonContext = nullptr;

@@ -1,5 +1,8 @@
+SHELL := /bin/bash
 CXX := g++
 LD := g++
+VALGRIND := valgrind
+TEE := tee
 
 OBJDIR := bin
 
@@ -41,8 +44,10 @@ HEADERS = Item.h \
 		  LinuxComparisonFactory.h \
 		  ComparisonContext.h
 
+TESTS = #LEAKCHECK
+
 .PHONY: all
-all: $(TARGET:%=$(OBJDIR)/%)
+all: $(TARGET:%=$(OBJDIR)/%) $(TESTS:%=$(OBJDIR)/%)
 
 $(TARGET:%=$(OBJDIR)/%): $(OBJS:%=$(OBJDIR)/%)
 	$(LD) $(LDFLAGS) -o $@ $^
@@ -52,6 +57,10 @@ $(OBJDIR)/%.o: %.cpp $(HEADERS)
 
 $(OBJS:%=$(OBJDIR)/%): | $(OBJDIR)
 $(TARGET:%=$(OBJDIR)/%): | $(OBJDIR)
+
+$(OBJDIR)/LEAKCHECK: $(TARGET:%=$(OBJDIR)/%)
+	$(VALGRIND) --leak-check=full --error-exitcode=1 $< 2>&1 >/dev/null | $(TEE) $@; \
+	test $${PIPESTATUS[0]} -eq 0
 
 $(OBJDIR):
 	mkdir -p $(OBJDIR)

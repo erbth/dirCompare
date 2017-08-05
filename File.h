@@ -2,6 +2,7 @@
 #define _FILE_H
 
 #include <iostream>
+#include <memory>
 #include <string>
 #include "Item.h"
 #include "Directory.h"
@@ -12,7 +13,7 @@ class File : public Item
 {
 public:
 	File(const string& path);
-	File(const string& path, const Directory* dir);
+	File(const string& path, shared_ptr<const Directory> dir);
 
 	virtual ~File();
 

@@ -1,3 +1,4 @@
+#include <memory>
 #include <string>
 #include "LinuxFile.h"
 #include "Item.h"
@@ -25,7 +26,8 @@ LinuxFile::LinuxFile(const string& path) : File(path)
 	init();
 }
 
-LinuxFile::LinuxFile(const string& path, const Directory* dir) : File(path, dir)
+LinuxFile::LinuxFile(const string& path, shared_ptr<const Directory> dir)
+ : File(path, dir)
 {
 	init();
 }
@@ -39,7 +41,7 @@ void LinuxFile::init()
 	if (directory)
 	{
 		fd = openat(
-			dynamic_cast<const LinuxDirectory*>(directory)->getFd(),
+			dynamic_pointer_cast<const LinuxDirectory>(directory)->getFd(),
 			path.c_str(),
 			O_RDONLY);
 	}

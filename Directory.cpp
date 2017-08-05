@@ -1,4 +1,5 @@
 #include <iostream>
+#include <memory>
 #include <string>
 #include <vector>
 #include "Directory.h"
@@ -10,7 +11,8 @@ Directory::Directory(const string& path) : Item(path)
 {
 }
 
-Directory::Directory(const string& path, const Directory* dir) : Item(path, dir)
+Directory::Directory(const string& path, shared_ptr<const Directory> dir)
+ : Item(path, dir)
 {
 }
 

@@ -27,7 +27,7 @@ LinuxDirectory::LinuxDirectory(const string& path) : Directory(path)
 	init();
 }
 
-LinuxDirectory::LinuxDirectory(const string& path, const Directory* dir)
+LinuxDirectory::LinuxDirectory(const string& path, shared_ptr<const Directory> dir)
  : Directory(path, dir)
 {
 	init();
@@ -42,7 +42,7 @@ void LinuxDirectory::init()
 	if (directory)
 	{
 		fd = openat(
-			dynamic_cast<const LinuxDirectory*>(directory)->getFd(),
+			dynamic_pointer_cast<const LinuxDirectory>(directory)->getFd(),
 			path.c_str(),
 			O_RDONLY | O_DIRECTORY);
 	}
@@ -130,6 +130,11 @@ vector<shared_ptr<Item>> LinuxDirectory::getItems() const
 
 	struct dirent *entry = static_cast<struct dirent*>(
 		malloc(offsetof(struct dirent, d_name) + name_max + 1));
+	
+	if (!entry)
+	{
+		throw gp_exception("failed to allocate memory for directory entry");
+	}
 
 	struct dirent *result;
 
@@ -137,6 +142,8 @@ vector<shared_ptr<Item>> LinuxDirectory::getItems() const
 	{
 		if (readdir_r(dir, entry, &result) < 0)
 		{
+			free(entry);
+			entry = nullptr;
 			throw errno_exception(errno, "reading directory " + path + ": ");
 		}
 
@@ -150,11 +157,15 @@ vector<shared_ptr<Item>> LinuxDirectory::getItems() const
 
 			if (result->d_type == DT_DIR)
 			{
-				v.push_back(make_shared<LinuxDirectory>(result->d_name, this));
+				v.push_back(make_shared<LinuxDirectory>(
+					result->d_name,
+					shared_from_this()));
 			}
 			else
 			{
-				auto f = make_shared<LinuxFile>(result->d_name, this);
+				auto f = make_shared<LinuxFile>(
+					result->d_name,
+					shared_from_this());
 
 				if (result->d_type == DT_UNKNOWN)
 				{
@@ -162,7 +173,7 @@ vector<shared_ptr<Item>> LinuxDirectory::getItems() const
 					{
 						v.push_back(make_shared<LinuxDirectory>(
 							result->d_name,
-							this));
+							shared_from_this()));
 					}
 				}
 				else
@@ -176,6 +187,9 @@ vector<shared_ptr<Item>> LinuxDirectory::getItems() const
 			break;
 		}
 	}
+
+	free(entry);
+	entry = nullptr;
 
 	sort(v.begin(), v.end(),[](shared_ptr<Item> i1, shared_ptr<Item> i2){
 		string p1 = i1->getPath();

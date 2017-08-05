@@ -2,6 +2,7 @@
 #define _ITEM_H
 
 #include <iostream>
+#include <memory>
 #include <string>
 
 using namespace std;
@@ -12,11 +13,11 @@ class Item
 {
 protected:
 	string path;
-	const Directory *directory;
+	shared_ptr<const Directory> directory;
 
 public:
 	Item(const string& path);
-	Item(const string& path, const Directory* dir);
+	Item(const string& path, shared_ptr<const Directory> dir);
 
 	virtual ~Item();
 
