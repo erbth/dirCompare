@@ -22,45 +22,32 @@ OBJS   = main.o \
 		 LinuxSimpleDirectoryComparison.o \
 		 LinuxComparisonFactory.o \
 		 ComparisonContext.o \
-		 DirectoryComparisonStrategy.o
+		 DirectoryComparisonStrategy.o \
+		 SystemParameters.o \
+		 Token.o \
+		 Value.o \
+		 Keyword.o
 
-HEADERS = Item.h \
-		  File.h \
-		  Directory.h \
-		  LinuxFile.h \
-		  LinuxDirectory.h \
-		  ItemFactory.h \
-		  LinuxItemFactory.h \
-		  errno_exception.h \
-		  gp_exception.h \
-		  LinuxFileInfo.h \
-		  FileComparisonStrategy.h \
-		  LinuxFileComparisonStrategy.h \
-		  LinuxSimpleFileComparison.h \
-		  DirectoryComparisonStrategy.h \
-		  LinuxDirectoryComparisonStrategy.h \
-		  LinuxSimpleDirectoryComparison.h \
-		  ComparisonStrategyFactory.h \
-		  LinuxComparisonFactory.h \
-		  ComparisonContext.h
-
-TESTS = #LEAKCHECK
+TESTS = LEAKCHECK
 
 .PHONY: all
-all: $(TARGET:%=$(OBJDIR)/%) $(TESTS:%=$(OBJDIR)/%)
+all: $(TARGET:%=$(OBJDIR)/%)
+
+.PHONY: test
+test: $(TESTS)
 
 $(TARGET:%=$(OBJDIR)/%): $(OBJS:%=$(OBJDIR)/%)
 	$(LD) $(LDFLAGS) -o $@ $^
 
 $(OBJDIR)/%.o: %.cpp $(HEADERS)
-	$(CXX) -c $(CXXFLAGS) -o $@ $<
+	$(CXX) -c $(CXXFLAGS) -MMD -o $@ $<
 
 $(OBJS:%=$(OBJDIR)/%): | $(OBJDIR)
 $(TARGET:%=$(OBJDIR)/%): | $(OBJDIR)
 
-$(OBJDIR)/LEAKCHECK: $(TARGET:%=$(OBJDIR)/%)
-	$(VALGRIND) --leak-check=full --error-exitcode=1 $< 2>&1 >/dev/null | $(TEE) $@; \
-	test $${PIPESTATUS[0]} -eq 0
+.PHONY: LEAKCHECK
+LEAKCHECK: $(TARGET:%=$(OBJDIR)/%)
+	$(VALGRIND) --leak-check=full --error-exitcode=1 $< >/dev/null
 
 $(OBJDIR):
 	mkdir -p $(OBJDIR)
@@ -68,3 +55,6 @@ $(OBJDIR):
 .PHONY: clean
 clean:
 	rm -rf $(OBJDIR)
+
+# include compiler generated dependency files for headers
+-include $(OBJDIR)/*.d

@@ -1,0 +1,41 @@
+% !TeX spellcheck = en_US
+\documentclass[a4paper]{article}
+\usepackage[hidelinks]{hyperref}
+\usepackage{tabularx}
+
+\title{Documentation for dirCompare}
+\author{Thomas Erbesdobler}
+\date{Last updated: \today}
+
+\setlength{\parskip}{1ex}
+
+\begin{document}
+	\maketitle
+	\tableofcontents
+	
+	\section{What is dirCompare?}
+	\label{sec:what_is_dircompare}
+	
+	''dirCompare'' is an open source tool for comparing directory trees. It is written in C++ and designed to be multi-platform with the capability to add more supported platforms quite easily. This is achieved using the abstract factory pattern.
+	
+	No initial release has been done yet, furthermore licensing information has still to be added.
+	
+	\section{User documentation}
+	\label{sec:user_documentation}
+	
+	\subsection{Command line Parameters}
+	\label{subsec:command_line_parameters}
+	
+	The following table lists all available command line parameters and their semantics:
+	
+	\noindent
+	\begin{tabularx}{\linewidth}{l|X}
+		\texttt{--dir1 \textless path\textgreater} & Path to first directory for comparison \\
+		\texttt{--dir2 \textless path\textgreater} & Path to second directory for comparison \\
+		\texttt{--listStrategies} & List file and directory comparison strategies \\
+		\texttt{--fileStrategy} & Specify the comparison strategy for files \\
+		\texttt{--dirStrategy} & Specify the comparison strategy for directories \\
+		\texttt{--logfile \textless path\textgreater} & Use the specified logfile. If none is given, the output is written to \texttt{stdout} or \texttt{stderr} \\
+	\end{tabularx}
+	
+\end{document}
