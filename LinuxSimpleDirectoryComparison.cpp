@@ -46,6 +46,11 @@ bool LinuxSimpleDirectoryComparison::compare(
 
 const string LinuxSimpleDirectoryComparison::getID() const
 {
-	return string("simple recursive directory comparison on Linux, "
-		"compares only directory content (recursively)");
+	return "simple";
+}
+
+const string LinuxSimpleDirectoryComparison::getDescription() const
+{
+	return "simple recursive directory comparison on Linux, "
+		"compares only directory content (recursively)";
 }

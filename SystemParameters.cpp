@@ -1,6 +1,7 @@
 #include <memory>
 #include <string>
 #include <ostream>
+#include "gp_exception.h"
 #include "FileComparisonStrategy.h"
 #include "DirectoryComparisonStrategy.h"
 #include "SystemParameters.h"
@@ -11,7 +12,8 @@ SystemParameters::SystemParameters() :
 	listStrategies(false),
 	fileComparisonStrategy(nullptr),
 	directoryComparisonStrategy(nullptr),
-	log(&cout, [](ostream*){})
+	log(&cout, [](ostream*){}),
+	externalLog(false)
 {
 }
 
@@ -77,6 +79,7 @@ void SystemParameters::setDirectoryComparisonStrategy(
 void SystemParameters::setLog(shared_ptr<ostream> l)
 {
 	log = l;
+	externalLog = true;
 }
 
 bool SystemParameters::isValid(ostream& errors) const
@@ -87,23 +90,41 @@ bool SystemParameters::isValid(ostream& errors) const
 	}
 	else
 	{
-		if (directory1.empty() || directory2.empty())
+		if (directory1.empty())
 		{
+			errors << "mandatory: directory 1's path not given" << endl;
+			return false;
+		}
+			
+		if (directory2.empty())
+		{
+			errors << "mandatory: directory 2's path not given" << endl;
 			return false;
 		}
 
-		if (fileComparisonStrategy == nullptr ||
-			directoryComparisonStrategy == nullptr)
+		if (fileComparisonStrategy == nullptr)
 		{
+			errors << "mandatory: no file comparison strategy given" << endl;
+			return false;
+		}
+		
+		if (directoryComparisonStrategy == nullptr)
+		{
+			errors << "mandatory: no directory comparison strategy given" << endl;
 			return false;
 		}
 
 		if (log == nullptr)
 		{
-			return false;
+			throw gp_exception("SystemParameters.log is nullptr");
 		}
 
 		return true;
 	}
+}
+
+bool SystemParameters::isExternalLogSet() const
+{
+	return externalLog;
 }
 

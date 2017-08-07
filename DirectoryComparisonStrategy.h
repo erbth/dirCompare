@@ -22,6 +22,7 @@ public:
 		shared_ptr<const Directory> d2) const = 0;
 
 	virtual const string getID() const = 0;
+	virtual const string getDescription() const = 0;
 };
 
 #endif /* _DIRECTORY_COMPARISON_STRATEGY_H */

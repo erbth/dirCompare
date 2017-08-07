@@ -23,6 +23,6 @@ void Value::setKeyword(shared_ptr<Keyword> k)
 	if (keyword != k)
 	{
 		keyword = k;
-		k->setValue(shared_from_this());
+		k->setValue(static_pointer_cast<Value>(shared_from_this()));
 	}
 }

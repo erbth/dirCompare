@@ -18,6 +18,7 @@ protected:
 	shared_ptr<FileComparisonStrategy> fileComparisonStrategy;
 	shared_ptr<DirectoryComparisonStrategy> directoryComparisonStrategy;
 	shared_ptr<ostream> log;
+	bool externalLog;
 
 public:
 	SystemParameters();
@@ -37,6 +38,7 @@ public:
 	void setLog(shared_ptr<ostream> l);
 
 	bool isValid(ostream& errors) const;
+	bool isExternalLogSet() const;
 };
 
 #endif /* _SYSTEM_PARAMETERS_H */

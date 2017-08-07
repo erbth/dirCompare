@@ -28,6 +28,10 @@ bool LinuxSimpleFileComparison::compare(
 
 const string LinuxSimpleFileComparison::getID() const
 {
-	string v("simple file comparison on Linux, compares only file parameters");
-	return v;
+	return "simple";
+}
+
+const string LinuxSimpleFileComparison::getDescription() const
+{
+	return "simple file comparison on Linux, compares only file parameters";
 }

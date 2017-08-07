@@ -16,6 +16,7 @@ public:
 		shared_ptr<const File> f2) const override;
 
 	virtual const string getID() const override;
+	virtual const string getDescription() const override;
 };
 
 #endif /* _LINUX_SIMPLE_FILE_COMPARISON_H */

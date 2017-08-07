@@ -8,9 +8,7 @@ using namespace std;
 
 class Value;
 
-class Keyword :
-	public Token,
-	public enable_shared_from_this<Keyword>
+class Keyword :	public Token
 {
 private:
 	shared_ptr<Value> value;

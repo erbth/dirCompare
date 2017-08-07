@@ -14,6 +14,7 @@ public:
 		shared_ptr<const Directory> d2) const override;
 
 	virtual const string getID() const override;
+	virtual const string getDescription() const override;
 };
 
 #endif /* _LINUX_SIMPLE_DIRECTORY_COMPARISON_H */

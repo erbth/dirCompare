@@ -13,6 +13,7 @@ public:
 		shared_ptr<const File> f2) const = 0;
 
 	virtual const string getID() const = 0;
+	virtual const string getDescription() const = 0;
 };
 
 #endif /* _FILE_COMPARISON_STRATEGY_H */
