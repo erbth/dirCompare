@@ -18,6 +18,7 @@ CXXFLAGS += -DTARGET_PLATFORM=$(TARGET_PLATFORM)
 
 TARGET = dirCompare
 OBJS   = main.o \
+		 ItemFactory.o \
          Item.o \
 		 File.o \
 		 Directory.o \
@@ -25,10 +26,14 @@ OBJS   = main.o \
 		 LinuxDirectory.o \
 		 LinuxItemFactory.o \
 		 LinuxFileInfo.o \
+		 LinuxFileComparisonStrategy.o \
+		 LinuxDirectoryComparisonStrategy.o \
 		 LinuxSimpleFileComparison.o \
 		 LinuxSimpleDirectoryComparison.o \
 		 LinuxComparisonFactory.o \
 		 ComparisonContext.o \
+		 ComparisonStrategyFactory.o \
+		 FileComparisonStrategy.o \
 		 DirectoryComparisonStrategy.o \
 		 SystemParameters.o \
 		 Token.o \
@@ -37,7 +42,10 @@ OBJS   = main.o \
 		 Commandline.o \
 		 platform.o
 
-TESTS  = LEAKCHECK
+TESTS  = TEST_LEAKCHECK_MATCH \
+		 TEST_LEAKCHECK_DIFFER \
+		 TEST_MATCH \
+		 TEST_DIFFER
 
 DOCS   = documentation.pdf
 
@@ -62,9 +70,30 @@ $(DOCDIR)/%.pdf: $(DOCDIR)/%.tex
 $(OBJS:%=$(OBJDIR)/%): | $(OBJDIR)
 $(TARGET:%=$(OBJDIR)/%): | $(OBJDIR)
 
-.PHONY: LEAKCHECK
-LEAKCHECK: $(TARGET:%=$(OBJDIR)/%)
-	$(VALGRIND) --leak-check=full --error-exitcode=1 $< >/dev/null
+.PHONY: TEST_LEAKCHECK_MATCH
+TEST_LEAKCHECK_MATCH: $(TARGET:%=$(OBJDIR)/%)
+	$(VALGRIND) --leak-check=full --error-exitcode=1 $< \
+		--dir1 testDir1 --dir2 testDir2 --fileStrategy simple --dirStrategy simple \
+		>/dev/null
+
+.PHONY: TEST_LEAKCHECK_DIFFER
+TEST_LEAKCHECK_DIFFER: $(TARGET:%=$(OBJDIR)/%)
+	$(VALGRIND) --leak-check=full --error-exitcode=100 $< \
+		--dir1 testDir1 --dir2 testDir3 --fileStrategy simple --dirStrategy simple \
+		>/dev/null; \
+		test $$? -ne 100
+
+.PHONY: TEST_MATCH
+TEST_MATCH: $(TARGET:%=$(OBJDIR)/%)
+	$< --dir1 testDir1 --dir2 testDir2 --fileStrategy simple --dirStrategy simple \
+	> /dev/null; \
+	test $$? -eq 0
+
+.PHONY: TEST_DIFFER
+TEST_DIFFER: $(TARGET:%=$(OBJDIR)/%)
+	$< --dir1 testDir1 --dir2 testDir3 --fileStrategy simple --dirStrategy simple \
+	> /dev/null; \
+	test $$? -ne 0
 
 $(OBJDIR):
 	mkdir -p $(OBJDIR)

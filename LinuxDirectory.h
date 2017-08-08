@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include "SystemParameters.h"
 #include "Directory.h"
 #include "Item.h"
 #include "LinuxFileInfo.h"
@@ -24,8 +25,11 @@ protected:
 	DIR *dir;
 
 public:
-	LinuxDirectory(const string& path);
-	LinuxDirectory(const string& path, shared_ptr<const Directory> dir);
+	LinuxDirectory(const string& path, shared_ptr<SystemParameters> sp);
+	LinuxDirectory(
+		const string& path,
+		shared_ptr<SystemParameters> sp,
+		shared_ptr<const Directory> dir);
 
 	virtual ~LinuxDirectory() override;
 

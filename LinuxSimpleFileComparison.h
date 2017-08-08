@@ -3,6 +3,7 @@
 
 #include <string>
 #include <memory>
+#include "SystemParameters.h"
 #include "File.h"
 #include "LinuxFileComparisonStrategy.h"
 
@@ -11,6 +12,8 @@ using namespace std;
 class LinuxSimpleFileComparison : public LinuxFileComparisonStrategy
 {
 public:
+	LinuxSimpleFileComparison(shared_ptr<SystemParameters> sp);
+
 	virtual bool compare(
 		shared_ptr<const File> f1,
 		shared_ptr<const File> f2) const override;

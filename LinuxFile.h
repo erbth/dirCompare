@@ -4,6 +4,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include "SystemParameters.h"
 #include "Item.h"
 #include "File.h"
 #include "Directory.h"
@@ -25,8 +26,11 @@ protected:
 	FILE* file;
 
 public:
-	LinuxFile(const string& path);
-	LinuxFile(const string& path, shared_ptr<const Directory> dir);
+	LinuxFile(const string& path, shared_ptr<SystemParameters> sp);
+	LinuxFile(
+		const string& path,
+		shared_ptr<SystemParameters> sp,
+		shared_ptr<const Directory> dir);
 
 	virtual ~LinuxFile();
 

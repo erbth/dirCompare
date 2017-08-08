@@ -4,10 +4,11 @@
 #include <iostream>
 #include <string>
 #include <memory>
-#include "FileComparisonStrategy.h"
-#include "DirectoryComparisonStrategy.h"
 
 using namespace std;
+
+class FileComparisonStrategy;
+class DirectoryComparisonStrategy;
 
 class SystemParameters
 {

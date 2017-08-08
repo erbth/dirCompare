@@ -53,11 +53,12 @@ void Commandline::addToken(const string& str)
 	}
 }
 
-void Commandline::parse(SystemParameters& param) const
+void Commandline::parse(shared_ptr<SystemParameters> param) const
 {
 	auto i = tokens.cbegin();
 
-	auto csf = createComparisonStrategyFactory();
+	auto csf = createComparisonStrategyFactory(
+		make_shared<SystemParameters>());
 
 	string logpath;
 
@@ -72,7 +73,7 @@ void Commandline::parse(SystemParameters& param) const
 
 			if (k->getStr() == "dir1")
 			{
-				if (!param.getDirectory1().empty())
+				if (!param->getDirectory1().empty())
 				{
 					throw gp_exception("dir1 duplicated");
 				}
@@ -84,11 +85,11 @@ void Commandline::parse(SystemParameters& param) const
 
 				i++;
 
-				param.setDirectory1(v->getStr());
+				param->setDirectory1(v->getStr());
 			}
 			else if (k->getStr() == "dir2")
 			{
-				if (!param.getDirectory2().empty())
+				if (!param->getDirectory2().empty())
 				{
 					throw gp_exception("dir2 duplicated");
 				}
@@ -100,15 +101,15 @@ void Commandline::parse(SystemParameters& param) const
 				
 				i++;
 
-				param.setDirectory2(v->getStr());
+				param->setDirectory2(v->getStr());
 			}
 			else if (k->getStr() == "listStrategies")
 			{
-				param.setListStrategies(true);
+				param->setListStrategies(true);
 			}
 			else if (k->getStr() == "fileStrategy")
 			{
-				if (param.getFileComparisonStrategy() != nullptr)
+				if (param->getFileComparisonStrategy() != nullptr)
 				{
 					throw gp_exception("fileStrategy duplicated");
 				}
@@ -127,7 +128,7 @@ void Commandline::parse(SystemParameters& param) const
 				{
 					if (i->getID() == v->getStr())
 					{
-						param.setFileComparisonStrategy(i);
+						param->setFileComparisonStrategy(i);
 						found = true;
 						break;
 					}
@@ -141,7 +142,7 @@ void Commandline::parse(SystemParameters& param) const
 			}
 			else if (k->getStr() == "dirStrategy")
 			{
-				if (param.getDirectoryComparisonStrategy() != nullptr)
+				if (param->getDirectoryComparisonStrategy() != nullptr)
 				{
 					throw gp_exception("dirStrategy duplicated");
 				}
@@ -160,7 +161,7 @@ void Commandline::parse(SystemParameters& param) const
 				{
 					if (i->getID() == v->getStr())
 					{
-						param.setDirectoryComparisonStrategy(i);
+						param->setDirectoryComparisonStrategy(i);
 						found = true;
 						break;
 					}
@@ -174,7 +175,7 @@ void Commandline::parse(SystemParameters& param) const
 			}
 			else if (k->getStr() == "logfile")
 			{
-				if (param.isExternalLogSet() || !logpath.empty())
+				if (param->isExternalLogSet() || !logpath.empty())
 				{
 					throw gp_exception("logfile duplicated");
 				}
@@ -190,7 +191,7 @@ void Commandline::parse(SystemParameters& param) const
 			}
 			else
 			{
-				throw gp_exception("unknown parameter: " + k->getStr());
+				throw gp_exception("unknown param->ter: " + k->getStr());
 			}
 		}
 		else
@@ -199,7 +200,7 @@ void Commandline::parse(SystemParameters& param) const
 		}
 	}
 
-	if (!logpath.empty() && !param.getListStrategies())
+	if (!logpath.empty() && !param->getListStrategies())
 	{
 		auto log = make_shared<ofstream>(
 			logpath,
@@ -211,6 +212,6 @@ void Commandline::parse(SystemParameters& param) const
 				"logfile: " + logpath);
 		}
 
-		param.setLog(log);
+		param->setLog(log);
 	}
 }

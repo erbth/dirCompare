@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include "SystemParameters.h"
 #include "Item.h"
 
 using namespace std;
@@ -13,8 +14,11 @@ using namespace std;
 class Directory : public Item, public enable_shared_from_this<Directory>
 {
 public:
-	Directory(const string& path);
-	Directory(const string& path, shared_ptr<const Directory> dir);
+	Directory(const string& path, shared_ptr<SystemParameters> sp);
+	Directory(
+		const string& path,
+		shared_ptr<SystemParameters> sp,
+		shared_ptr<const Directory> dir);
 
 	virtual ~Directory();
 

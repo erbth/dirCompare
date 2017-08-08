@@ -2,6 +2,7 @@
 #include <vector>
 #include <memory>
 #include <algorithm>
+#include "SystemParameters.h"
 #include "errno_exception.h"
 #include "gp_exception.h"
 #include "Item.h"
@@ -22,13 +23,17 @@ extern "C"
 	#include <errno.h>
 }
 
-LinuxDirectory::LinuxDirectory(const string& path) : Directory(path)
+LinuxDirectory::LinuxDirectory(const string& path, shared_ptr<SystemParameters> sp)
+	: Directory(path, sp)
 {
 	init();
 }
 
-LinuxDirectory::LinuxDirectory(const string& path, shared_ptr<const Directory> dir)
- : Directory(path, dir)
+LinuxDirectory::LinuxDirectory(
+	const string& path,
+	shared_ptr<SystemParameters> sp,
+	shared_ptr<const Directory> dir)
+	: Directory(path, sp, dir)
 {
 	init();
 }
@@ -159,12 +164,14 @@ vector<shared_ptr<Item>> LinuxDirectory::getItems() const
 			{
 				v.push_back(make_shared<LinuxDirectory>(
 					result->d_name,
+					sp,
 					shared_from_this()));
 			}
 			else
 			{
 				auto f = make_shared<LinuxFile>(
 					result->d_name,
+					sp,
 					shared_from_this());
 
 				if (result->d_type == DT_UNKNOWN)
@@ -173,6 +180,7 @@ vector<shared_ptr<Item>> LinuxDirectory::getItems() const
 					{
 						v.push_back(make_shared<LinuxDirectory>(
 							result->d_name,
+							sp,
 							shared_from_this()));
 					}
 				}

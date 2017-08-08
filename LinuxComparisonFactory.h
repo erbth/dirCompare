@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <memory>
+#include "SystemParameters.h"
 #include "FileComparisonStrategy.h"
 #include "DirectoryComparisonStrategy.h"
 #include "ComparisonStrategyFactory.h"
@@ -12,6 +13,8 @@ using namespace std;
 class LinuxComparisonFactory : public ComparisonStrategyFactory
 {
 public:
+	LinuxComparisonFactory(shared_ptr<SystemParameters> sp);
+
 	virtual vector<shared_ptr<FileComparisonStrategy>>
 		createFileStrategies() override;
 

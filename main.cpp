@@ -11,19 +11,19 @@
 int main(int argc, char** argv)
 {
 	Commandline cl(argc - 1, argv + 1);
-	SystemParameters sp;
+	auto sp = make_shared<SystemParameters>();
 
 	cl.parse(sp);
 
-	if (!sp.isValid(cerr))
+	if (!sp->isValid(cerr))
 	{
 		cerr << endl << "invalid parameters, exiting." << endl;
-		return EXIT_SUCCESS;
+		return 1;
 	}
 
-	if (sp.getListStrategies())
+	if (sp->getListStrategies())
 	{
-		auto csf = createComparisonStrategyFactory();
+		auto csf = createComparisonStrategyFactory(sp);
 
 		auto fileStrategies = csf->createFileStrategies();
 		auto dirStrategies = csf->createDirStrategies();
@@ -48,15 +48,18 @@ int main(int argc, char** argv)
 	{
 	}	
 
-	ComparisonContext cc;
-	cc.setFileComparisonStrategy(sp.getFileComparisonStrategy());
-	cc.setDirectoryComparisonStrategy(sp.getDirectoryComparisonStrategy());
+	ComparisonContext cc(sp);
+	cc.setFileComparisonStrategy(sp->getFileComparisonStrategy());
+	cc.setDirectoryComparisonStrategy(sp->getDirectoryComparisonStrategy());
 
-	auto f = createItemFactory();
+	auto f = createItemFactory(sp);
 
 	/* test directory */
-	auto d1 = f->createDirectory(sp.getDirectory1());
-	auto d2 = f->createDirectory(sp.getDirectory2());
+	auto d1 = f->createDirectory(sp->getDirectory1());
+	auto d2 = f->createDirectory(sp->getDirectory2());
 
-	cout << cc.compare(d1, d2) << endl;
+	bool equal = cc.compare(d1, d2);
+	cout << (equal ? "match" : "differ") << endl;
+
+	return equal ? 0 : 1;
 }

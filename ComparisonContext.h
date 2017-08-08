@@ -2,6 +2,7 @@
 #define _COMPARISON_CONTEXT_H
 
 #include <memory>
+#include "SystemParameters.h"
 #include "Item.h"
 #include "FileComparisonStrategy.h"
 #include "DirectoryComparisonStrategy.h"
@@ -11,11 +12,12 @@ using namespace std;
 class ComparisonContext
 {
 private:
+	shared_ptr<SystemParameters> sp;
 	shared_ptr<FileComparisonStrategy> fileStrategy;
 	shared_ptr<DirectoryComparisonStrategy> dirStrategy;
 
 public:
-	ComparisonContext() : fileStrategy(nullptr) {};
+	ComparisonContext(shared_ptr<SystemParameters> sp);
 
 	shared_ptr<FileComparisonStrategy> getFileComparisonStrategy() const;
 	void setFileComparisonStrategy(shared_ptr<FileComparisonStrategy> s);

@@ -1,5 +1,6 @@
 #include <memory>
 #include <string>
+#include "SystemParameters.h"
 #include "gp_exception.h"
 #include "Item.h"
 #include "File.h"
@@ -7,6 +8,13 @@
 #include "FileComparisonStrategy.h"
 #include "DirectoryComparisonStrategy.h"
 #include "ComparisonContext.h"
+
+ComparisonContext::ComparisonContext(shared_ptr<SystemParameters> sp)
+{
+	fileStrategy = nullptr;
+	dirStrategy = nullptr;
+	this->sp = sp;
+}
 
 shared_ptr<FileComparisonStrategy>
 	ComparisonContext::getFileComparisonStrategy() const

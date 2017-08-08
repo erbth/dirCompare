@@ -1,10 +1,17 @@
 #include <string>
 #include <memory>
+#include "SystemParameters.h"
 #include "File.h"
 #include "LinuxFile.h"
 #include "LinuxSimpleFileComparison.h"
 
 using namespace std;
+
+LinuxSimpleFileComparison::LinuxSimpleFileComparison(
+	shared_ptr<SystemParameters> sp)
+	: LinuxFileComparisonStrategy(sp)
+{
+}
 
 bool LinuxSimpleFileComparison::compare(
 	shared_ptr<const File> f1,

@@ -2,6 +2,7 @@
 #define _PLATFORM_H
 
 #include <memory>
+#include "SystemParameters.h"
 #include "ItemFactory.h"
 #include "ComparisonStrategyFactory.h"
 
@@ -17,7 +18,8 @@
 #define LINUX 1
 
 /* methods for creating platform dependent factories */
-shared_ptr<ItemFactory> createItemFactory();
-shared_ptr<ComparisonStrategyFactory> createComparisonStrategyFactory();
+shared_ptr<ItemFactory> createItemFactory(shared_ptr<SystemParameters> sp);
+shared_ptr<ComparisonStrategyFactory> createComparisonStrategyFactory(
+	shared_ptr<SystemParameters> sp);
 
 #endif /* _PLATFORM_H */

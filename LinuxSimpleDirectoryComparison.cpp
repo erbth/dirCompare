@@ -1,11 +1,18 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include "SystemParameters.h"
 #include "gp_exception.h"
 #include "Item.h"
 #include "Directory.h"
 #include "LinuxSimpleDirectoryComparison.h"
 #include "ComparisonContext.h"
+
+LinuxSimpleDirectoryComparison::LinuxSimpleDirectoryComparison(
+	shared_ptr<SystemParameters> sp)
+	: LinuxDirectoryComparisonStrategy(sp)
+{
+}
 
 bool LinuxSimpleDirectoryComparison::compare(
 	shared_ptr<const Directory> d1,

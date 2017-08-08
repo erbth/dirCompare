@@ -1,6 +1,13 @@
 #include <memory>
+#include "SystemParameters.h"
 #include "ComparisonContext.h"
 #include "DirectoryComparisonStrategy.h"
+
+DirectoryComparisonStrategy::DirectoryComparisonStrategy(
+	shared_ptr<SystemParameters> sp)
+{
+	this->sp = sp;
+}
 
 const ComparisonContext* DirectoryComparisonStrategy::
 	getComparisonContext() const

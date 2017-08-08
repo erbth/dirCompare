@@ -19,7 +19,7 @@ private:
 public:
 	Commandline(int argy, char** argv);
 
-	void parse(SystemParameters& param) const;
+	void parse(shared_ptr<SystemParameters> param) const;
 };
 
 #endif /* _COMMANDLINE_H */

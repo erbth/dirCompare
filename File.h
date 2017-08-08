@@ -4,6 +4,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include "SystemParameters.h"
 #include "Item.h"
 #include "Directory.h"
 
@@ -12,8 +13,11 @@ using namespace std;
 class File : public Item
 {
 public:
-	File(const string& path);
-	File(const string& path, shared_ptr<const Directory> dir);
+	File(const string& path, shared_ptr<SystemParameters> sp);
+	File(
+		const string& path,
+		shared_ptr<SystemParameters> sp,
+		shared_ptr<const Directory> dir);
 
 	virtual ~File();
 

@@ -3,6 +3,7 @@
 
 #include <string>
 #include <memory>
+#include "SystemParameters.h"
 #include "Directory.h"
 
 class ComparisonContext;
@@ -11,9 +12,12 @@ class DirectoryComparisonStrategy :
 	public enable_shared_from_this<DirectoryComparisonStrategy>
 {
 protected:
+	shared_ptr<SystemParameters> sp;
 	const ComparisonContext* comparisonContext = nullptr;
 
 public:
+	DirectoryComparisonStrategy(shared_ptr<SystemParameters> sp);
+
 	const ComparisonContext *getComparisonContext() const;
 	void setComparisonContext(ComparisonContext *c);
 
