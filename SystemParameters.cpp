@@ -10,8 +10,6 @@ using namespace std;
 
 SystemParameters::SystemParameters() :
 	listStrategies(false),
-	fileComparisonStrategy(nullptr),
-	directoryComparisonStrategy(nullptr),
 	log(&cout, [](ostream*){}),
 	externalLog(false)
 {
@@ -32,14 +30,12 @@ bool SystemParameters::getListStrategies() const
 	return listStrategies;
 }
 
-shared_ptr<FileComparisonStrategy>
-	SystemParameters::getFileComparisonStrategy() const
+const string SystemParameters::getFileComparisonStrategy() const
 {
 	return fileComparisonStrategy;
 }
 
-shared_ptr<DirectoryComparisonStrategy>
-	SystemParameters::getDirectoryComparisonStrategy() const
+const string SystemParameters::getDirectoryComparisonStrategy() const
 {
 	return directoryComparisonStrategy;
 }
@@ -64,14 +60,12 @@ void SystemParameters::setListStrategies(bool l)
 	listStrategies = l;
 }
 
-void SystemParameters::setFileComparisonStrategy(
-	shared_ptr<FileComparisonStrategy> s)
+void SystemParameters::setFileComparisonStrategy(const string s)
 {
 	fileComparisonStrategy = s;
 }
 
-void SystemParameters::setDirectoryComparisonStrategy(
-	shared_ptr<DirectoryComparisonStrategy> s)
+void SystemParameters::setDirectoryComparisonStrategy(const string s)
 {
 	directoryComparisonStrategy = s;
 }
@@ -102,13 +96,13 @@ bool SystemParameters::isValid(ostream& errors) const
 			return false;
 		}
 
-		if (fileComparisonStrategy == nullptr)
+		if (fileComparisonStrategy.empty())
 		{
 			errors << "mandatory: no file comparison strategy given" << endl;
 			return false;
 		}
 		
-		if (directoryComparisonStrategy == nullptr)
+		if (directoryComparisonStrategy.empty())
 		{
 			errors << "mandatory: no directory comparison strategy given" << endl;
 			return false;

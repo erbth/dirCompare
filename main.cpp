@@ -52,23 +52,32 @@ int main(int argc, char** argv)
 		{
 			cout << "(" << s->getID() << ") " << s->getDescription() << endl;
 		}
+
+		return 0;
 	}
 	else
 	{
-	}	
+		auto csf = createComparisonStrategyFactory(sp);
 
-	ComparisonContext cc(sp);
-	cc.setFileComparisonStrategy(sp->getFileComparisonStrategy());
-	cc.setDirectoryComparisonStrategy(sp->getDirectoryComparisonStrategy());
+		auto fileStrategy = csf->createFileStrategy(
+			sp->getFileComparisonStrategy());
 
-	auto f = createItemFactory(sp);
+		auto dirStrategy = csf->createDirStrategy(
+			sp->getDirectoryComparisonStrategy());
 
-	/* test directory */
-	auto d1 = f->createDirectory(sp->getDirectory1());
-	auto d2 = f->createDirectory(sp->getDirectory2());
+		ComparisonContext cc(sp);
+		cc.setFileComparisonStrategy(fileStrategy);
+		cc.setDirectoryComparisonStrategy(dirStrategy);
 
-	bool equal = cc.compare(d1, d2);
-	*(sp->getLog()) << (equal ? "match" : "differ") << endl;
+		auto f = createItemFactory(sp);
 
-	return equal ? 0 : 1;
+		/* test directory */
+		auto d1 = f->createDirectory(sp->getDirectory1());
+		auto d2 = f->createDirectory(sp->getDirectory2());
+
+		bool equal = cc.compare(d1, d2);
+		*(sp->getLog()) << (equal ? "match" : "differ") << endl;
+
+		return equal ? 0 : 1;
+	}
 }

@@ -16,8 +16,8 @@ protected:
 	string directory1;
 	string directory2;
 	bool listStrategies;
-	shared_ptr<FileComparisonStrategy> fileComparisonStrategy;
-	shared_ptr<DirectoryComparisonStrategy> directoryComparisonStrategy;
+	string fileComparisonStrategy;
+	string directoryComparisonStrategy;
 	shared_ptr<ostream> log;
 	bool externalLog;
 
@@ -27,15 +27,15 @@ public:
 	string getDirectory1() const;
 	string getDirectory2() const;
 	bool getListStrategies() const;
-	shared_ptr<FileComparisonStrategy> getFileComparisonStrategy() const;
-	shared_ptr<DirectoryComparisonStrategy> getDirectoryComparisonStrategy() const;
+	const string getFileComparisonStrategy() const;
+	const string getDirectoryComparisonStrategy() const;
 	shared_ptr<ostream> getLog() const;
 
 	void setDirectory1(string dir);
 	void setDirectory2(string dir);
 	void setListStrategies(bool l);
-	void setFileComparisonStrategy(shared_ptr<FileComparisonStrategy> s);
-	void setDirectoryComparisonStrategy(shared_ptr<DirectoryComparisonStrategy> s);
+	void setFileComparisonStrategy(const string s);
+	void setDirectoryComparisonStrategy(const string s);
 	void setLog(shared_ptr<ostream> l);
 
 	bool isValid(ostream& errors) const;

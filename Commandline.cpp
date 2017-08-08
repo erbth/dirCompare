@@ -108,7 +108,7 @@ void Commandline::parse(shared_ptr<SystemParameters> param) const
 			}
 			else if (k->getStr() == "fileStrategy")
 			{
-				if (param->getFileComparisonStrategy() != nullptr)
+				if (!param->getFileComparisonStrategy().empty())
 				{
 					throw gp_exception("fileStrategy duplicated");
 				}
@@ -127,7 +127,7 @@ void Commandline::parse(shared_ptr<SystemParameters> param) const
 				{
 					if (i->getID() == v->getStr())
 					{
-						param->setFileComparisonStrategy(i);
+						param->setFileComparisonStrategy(i->getID());
 						found = true;
 						break;
 					}
@@ -141,7 +141,7 @@ void Commandline::parse(shared_ptr<SystemParameters> param) const
 			}
 			else if (k->getStr() == "dirStrategy")
 			{
-				if (param->getDirectoryComparisonStrategy() != nullptr)
+				if (!param->getDirectoryComparisonStrategy().empty())
 				{
 					throw gp_exception("dirStrategy duplicated");
 				}
@@ -160,7 +160,7 @@ void Commandline::parse(shared_ptr<SystemParameters> param) const
 				{
 					if (i->getID() == v->getStr())
 					{
-						param->setDirectoryComparisonStrategy(i);
+						param->setDirectoryComparisonStrategy(i->getID());
 						found = true;
 						break;
 					}

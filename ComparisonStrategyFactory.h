@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <memory>
+#include <string>
 #include "SystemParameters.h"
 #include "FileComparisonStrategy.h"
 #include "DirectoryComparisonStrategy.h"
@@ -22,6 +23,9 @@ public:
 
 	virtual vector<shared_ptr<DirectoryComparisonStrategy>>
 		createDirStrategies() = 0;
+
+	shared_ptr<FileComparisonStrategy> createFileStrategy(const string id);
+	shared_ptr<DirectoryComparisonStrategy> createDirStrategy(const string id);
 };
 
 #endif /* _COMPARISON_STRATEGY_FACTORY_H */
