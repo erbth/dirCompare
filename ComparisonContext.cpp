@@ -60,7 +60,8 @@ bool ComparisonContext::compare(
 				throw gp_exception("file comparison strategy not set!");
 			}
 
-			bool equal = fileStrategy->compare(f1, f2);
+			string reason;
+			bool equal = fileStrategy->compare(f1, f2, &reason);
 
 			if (!equal)
 			{
@@ -70,7 +71,8 @@ bool ComparisonContext::compare(
 				}
 
 				*(sp->getLog()) << "files " << f1->getPath() << " and "
-					<< f2->getPath() << " differ" << endl;
+					<< f2->getPath() << " differ" << (reason.empty() ? "" :
+					"(reason: " + reason + ")") << endl;
 			}
 
 			return equal;
@@ -86,7 +88,8 @@ bool ComparisonContext::compare(
 				throw gp_exception("directory comparison strategy not set!");
 			}
 
-			bool equal = dirStrategy->compare(d1, d2);
+			string reason;
+			bool equal = dirStrategy->compare(d1, d2, &reason);
 
 			if (!equal)
 			{
@@ -96,7 +99,8 @@ bool ComparisonContext::compare(
 				}
 
 				*(sp->getLog()) << "directories " << d1->getPath() << " and "
-					<< d2->getPath() << " differ" << endl;
+					<< d2->getPath() << " differ" << (reason.empty() ? "" :
+					"(reason: " + reason + ")") << endl;
 			}
 
 			return equal;

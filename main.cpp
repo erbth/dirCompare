@@ -30,6 +30,20 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
+	cout << endl << "ignored files:" << endl;
+	for (auto f : sp->getIgnoreFiles())
+	{
+		cout << f << endl;
+	}
+
+	cout << endl << "ignored directories:" << endl;
+	for (auto d : sp->getIgnoreDirectories())
+	{
+		cout << d << endl;
+	}
+
+	cout << endl;
+
 	if (sp->getListStrategies())
 	{
 		auto csf = createComparisonStrategyFactory(sp);

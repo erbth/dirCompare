@@ -188,6 +188,28 @@ void Commandline::parse(shared_ptr<SystemParameters> param) const
 
 				logpath = v->getStr();
 			}
+			else if (k->getStr() == "ignoreFile")
+			{
+				if (v == nullptr)
+				{
+					throw gp_exception("ignoreFile: need to specify name");
+				}
+
+				i++;
+
+				param->ignoreFile(v->getStr());
+			}
+			else if (k->getStr() == "ignoreDir")
+			{
+				if (v == nullptr)
+				{
+					throw gp_exception("ignoreDir: need to specify name");
+				}
+
+				i++;
+
+				param->ignoreDirectory(v->getStr());
+			}
 			else
 			{
 				throw gp_exception("unknown parameter: " + k->getStr());

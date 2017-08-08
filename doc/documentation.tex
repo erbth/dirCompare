@@ -2,12 +2,15 @@
 \documentclass[a4paper]{article}
 \usepackage[hidelinks]{hyperref}
 \usepackage{tabularx}
+\usepackage{color}
 
 \title{Documentation for dirCompare}
 \author{Thomas Erbesdobler}
 \date{Last updated: \today}
 
 \setlength{\parskip}{1ex}
+
+\newenvironment{note}{\color{magenta}}{\normalcolor}
 
 \begin{document}
 	\maketitle
@@ -16,8 +19,9 @@
 	\section{What is dirCompare?}
 	\label{sec:what_is_dircompare}
 	
-	''dirCompare'' is an open source tool for comparing directory trees. It is written in C++ and designed to be multi-platform with the capability to add more supported platforms quite easily. This is achieved using the abstract factory pattern.
+	''dirCompare'' is yet another open source tool for comparing directory trees. It is written in C++ and designed to be multi-platform with the capability to add more supported platforms quite easily. This is achieved using the abstract factory pattern.
 	
+	\noindent
 	No initial release has been done yet, furthermore licensing information has still to be added.
 	
 	\section{User documentation}
@@ -35,12 +39,33 @@
 		\texttt{--listStrategies} & List file and directory comparison strategies \\
 		\texttt{--fileStrategy \textless id\textgreater} & Specify the comparison strategy for files \\
 		\texttt{--dirStrategy \textless id\textgreater} & Specify the comparison strategy for directories \\
-		\texttt{--logfile \textless path\textgreater} & Use the specified logfile. If none is given, the output is written to \texttt{stdout} or \texttt{stderr} \\
+		\texttt{--ignoreFile \textless name\textgreater} & Ignore all files with the given name. This parameter might be specified multiple times. \\
+		\texttt{--ignoreDir \textless name\textgreater} & Ignore all directories with the given name. This parameter might be specified multiple times. \\
+		\texttt{--logfile \textless path\textgreater} & Use the specified log file. If none is given, the log output is written to \texttt{stdout} \\
 	\end{tabularx}
 	
 	\subsection{Return code}
 	\label{subsec:return_code}
 	
 	A return code of 0 signals an equality of the two directories in respect to the given comparison strategies. A different return code signals either their inequality or an error/failure like an invalid command line.
+	
+	\subsection{Comparison strategies}
+	\label{subsec:comparison_strategies}
+	
+	Due to the internal structure of the system, the specified root directories are never filtered out, independent of the selected directory comparison strategy.
+	
+	\paragraph{Linux} The following file comparison strategies are currently available on the Linux platform:
+	
+	\noindent
+	\begin{tabularx}{\linewidth}{lX}
+		simple & Compares only the file parameters retrieved via \texttt{stat} except ctime, the inode number and device id. \begin{note} Is this true? \end{note} In case of a difference the reason is listed in the output log. However, not all inequalities are listed but only the first one compared and found unequal. This file comparison strategy performs no filtering, this has to be done by the used directory comparison strategy which is the only part of the system that can query files.
+	\end{tabularx}
+	
+	\paragraph{All target platforms} The following directory comparison strategies are currently available on any target platform:
+	
+	\noindent
+	\begin{tabularx}{\linewidth}{lX}
+		simple & Compares only the directory content in a recursive manner. That is, two directories differ exactly if not all items are the same. Two items are equal if they are considered equal by the associated comparison strategy and additionally have the same name. Since the reason for inequality is always the difference of content, none is listed in the log. But if items are present in only one directory, this is listed and also in which one. This directory comparison strategy applies the set file- and directory filter in respect to the items included in the actual directory.
+	\end{tabularx}
 	
 \end{document}

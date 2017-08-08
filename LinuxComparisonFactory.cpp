@@ -5,7 +5,7 @@
 #include "DirectoryComparisonStrategy.h"
 #include "LinuxComparisonFactory.h"
 #include "LinuxSimpleFileComparison.h"
-#include "LinuxSimpleDirectoryComparison.h"
+#include "SimpleDirectoryComparison.h"
 
 using namespace std;
 
@@ -29,7 +29,7 @@ vector<shared_ptr<DirectoryComparisonStrategy>>
 {
 	vector<shared_ptr<DirectoryComparisonStrategy>> v;
 
-	v.push_back(make_shared<LinuxSimpleDirectoryComparison>(sp));
+	v.push_back(make_shared<SimpleDirectoryComparison>(sp));
 
 	return v;
 }

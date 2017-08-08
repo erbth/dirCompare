@@ -5,18 +5,20 @@
 #include "gp_exception.h"
 #include "Item.h"
 #include "Directory.h"
-#include "LinuxSimpleDirectoryComparison.h"
+#include "SimpleDirectoryComparison.h"
 #include "ComparisonContext.h"
+#include "ignoring.h"
 
-LinuxSimpleDirectoryComparison::LinuxSimpleDirectoryComparison(
+SimpleDirectoryComparison::SimpleDirectoryComparison(
 	shared_ptr<SystemParameters> sp)
-	: LinuxDirectoryComparisonStrategy(sp)
+	: DirectoryComparisonStrategy(sp)
 {
 }
 
-bool LinuxSimpleDirectoryComparison::compare(
+bool SimpleDirectoryComparison::compare(
 	shared_ptr<const Directory> d1,
-	shared_ptr<const Directory> d2) const
+	shared_ptr<const Directory> d2,
+	string* reason) const
 {
 	if (!comparisonContext)
 	{
@@ -40,6 +42,18 @@ bool LinuxSimpleDirectoryComparison::compare(
 		
 		string p1 = it1 != itemsD1.end() ? (*it1)->getPath() : string();
 		string p2 = it2 != itemsD2.end() ? (*it2)->getPath() : string();
+
+		if (!p1.empty() && ignoreItem(*it1, sp))
+		{
+			it1++;
+			continue;
+		}
+
+		if (!p2.empty() && ignoreItem(*it2, sp))
+		{
+			it2++;
+			continue;
+		}
 
 		if (p1 == p2)
 		{
@@ -81,13 +95,13 @@ bool LinuxSimpleDirectoryComparison::compare(
 	}
 }
 
-const string LinuxSimpleDirectoryComparison::getID() const
+const string SimpleDirectoryComparison::getID() const
 {
 	return "simple";
 }
 
-const string LinuxSimpleDirectoryComparison::getDescription() const
+const string SimpleDirectoryComparison::getDescription() const
 {
-	return "simple recursive directory comparison on Linux, "
+	return "simple platfrom independent recursive directory comparison, "
 		"compares only directory content (recursively)";
 }

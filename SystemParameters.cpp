@@ -1,6 +1,8 @@
 #include <memory>
 #include <string>
 #include <ostream>
+#include <vector>
+#include <algorithm>
 #include "gp_exception.h"
 #include "FileComparisonStrategy.h"
 #include "DirectoryComparisonStrategy.h"
@@ -38,6 +40,16 @@ const string SystemParameters::getFileComparisonStrategy() const
 const string SystemParameters::getDirectoryComparisonStrategy() const
 {
 	return directoryComparisonStrategy;
+}
+
+const vector<string> SystemParameters::getIgnoreFiles() const
+{
+	return ignoreFiles;
+}
+
+const vector<string> SystemParameters::getIgnoreDirectories() const
+{
+	return ignoreDirectories;
 }
 
 shared_ptr<ostream> SystemParameters::getLog() const
@@ -122,3 +134,30 @@ bool SystemParameters::isExternalLogSet() const
 	return externalLog;
 }
 
+void SystemParameters::ignoreFile(const string name)
+{
+	if (!name.empty())
+	{
+		if (find(
+			ignoreFiles.cbegin(),
+			ignoreFiles.cend(),
+			name) == ignoreFiles.cend())
+		{
+			ignoreFiles.push_back(name);
+		}
+	}
+}
+
+void SystemParameters:: ignoreDirectory(const string name)
+{
+	if (!name.empty())
+	{
+		if (find(
+			ignoreDirectories.cbegin(),
+			ignoreDirectories.cend(),
+			name) == ignoreDirectories.cend())
+		{
+			ignoreDirectories.push_back(name);
+		}
+	}
+}

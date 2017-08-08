@@ -16,7 +16,8 @@ public:
 
 	virtual bool compare(
 		shared_ptr<const File> f1,
-		shared_ptr<const File> f2) const = 0;
+		shared_ptr<const File> f2,
+		string* reason = nullptr) const = 0;
 
 	virtual const string getID() const = 0;
 	virtual const string getDescription() const = 0;

@@ -29,8 +29,8 @@ OBJS   = main.o \
 		 LinuxFileComparisonStrategy.o \
 		 LinuxDirectoryComparisonStrategy.o \
 		 LinuxSimpleFileComparison.o \
-		 LinuxSimpleDirectoryComparison.o \
 		 LinuxComparisonFactory.o \
+		 SimpleDirectoryComparison.o \
 		 ComparisonContext.o \
 		 ComparisonStrategyFactory.o \
 		 FileComparisonStrategy.o \
@@ -40,6 +40,7 @@ OBJS   = main.o \
 		 Value.o \
 		 Keyword.o \
 		 Commandline.o \
+		 ignoring.o \
 		 platform.o
 
 TESTS  = TEST_LEAKCHECK_MATCH \
