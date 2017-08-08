@@ -40,8 +40,6 @@ LinuxDirectory::LinuxDirectory(
 
 void LinuxDirectory::init()
 {
-	cout << "Trying to open LinuxDirectory " << path.c_str() << " ..." << endl;
-
 	int fd;
 
 	if (directory)
@@ -92,8 +90,6 @@ void LinuxDirectory::init()
 
 		throw gp_exception(path + string(" Is not a directory."));
 	}
-
-	cout << "LinuxDirectory  " << path << " created" << endl;
 }
 
 LinuxDirectory::~LinuxDirectory()
@@ -102,8 +98,6 @@ LinuxDirectory::~LinuxDirectory()
 	{
 		throw errno_exception(errno);
 	}
-
-	cout << "LinuxDirectory " << path << " closed" << endl;
 }
 
 LinuxFileInfo LinuxDirectory::getFileInfo() const

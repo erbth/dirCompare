@@ -15,6 +15,7 @@ class Item
 protected:
 	shared_ptr<SystemParameters> sp;
 	string path;
+	int level;
 	shared_ptr<const Directory> directory;
 
 public:
@@ -26,7 +27,8 @@ public:
 
 	virtual ~Item();
 
-	const string& getPath();
+	const string& getPath() const;
+	const int getLevel() const;
 
 	virtual ostream& dump(ostream& o) const
 	{

@@ -48,33 +48,63 @@ bool ComparisonContext::compare(
 	shared_ptr<const Item> i1,
 	shared_ptr<const Item> i2) const
 {
-	auto f1 = dynamic_pointer_cast<const File>(i1);
-	auto f2 = dynamic_pointer_cast<const File>(i2);
-
-	if (f1 != nullptr && f2 != nullptr)
+	if (i1->getLevel() == i2->getLevel())
 	{
-		if (!fileStrategy)
+		auto f1 = dynamic_pointer_cast<const File>(i1);
+		auto f2 = dynamic_pointer_cast<const File>(i2);
+
+		if (f1 != nullptr && f2 != nullptr)
 		{
-			throw gp_exception("file comparison strategy not set!");
+			if (!fileStrategy)
+			{
+				throw gp_exception("file comparison strategy not set!");
+			}
+
+			bool equal = fileStrategy->compare(f1, f2);
+
+			if (!equal)
+			{
+				for (int i = 0; i < f1->getLevel(); i++)
+				{
+					*(sp->getLog()) << "  ";
+				}
+
+				*(sp->getLog()) << "files " << f1->getPath() << " and "
+					<< f2->getPath() << " differ" << endl;
+			}
+
+			return equal;
 		}
 
-		return fileStrategy->compare(f1, f2);
-	}
+		auto d1 = dynamic_pointer_cast<const Directory>(i1);
+		auto d2 = dynamic_pointer_cast<const Directory>(i2);
 
-	auto d1 = dynamic_pointer_cast<const Directory>(i1);
-	auto d2 = dynamic_pointer_cast<const Directory>(i2);
-
-	if (d1 != nullptr && d2 != nullptr)
-	{
-		if (!dirStrategy)
+		if (d1 != nullptr && d2 != nullptr)
 		{
-			throw gp_exception("directory comparison strategy not set!");
-		}
+			if (!dirStrategy)
+			{
+				throw gp_exception("directory comparison strategy not set!");
+			}
 
-		return dirStrategy->compare(d1, d2);
+			bool equal = dirStrategy->compare(d1, d2);
+
+			if (!equal)
+			{
+				for (int i = 0; i < d1->getLevel(); i++)
+				{
+					*(sp->getLog()) << "  ";
+				}
+
+				*(sp->getLog()) << "directories " << d1->getPath() << " and "
+					<< d2->getPath() << " differ" << endl;
+			}
+
+			return equal;
+		}
 	}
 
-	/* TODO: different return value for not comparable (file & dir)
-	 * as well as more detailed difference */
+	throw gp_exception("items " + i1->getPath() + " and " +
+		i2->getPath() + " are not comparable");
+
 	return false;
 }

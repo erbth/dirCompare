@@ -29,25 +29,55 @@ bool LinuxSimpleDirectoryComparison::compare(
 	auto it1 = itemsD1.cbegin();
 	auto it2 = itemsD2.cbegin();
 
+	bool equal = true;
+
 	for (;;)
 	{
 		if (it1 == itemsD1.end() && it2 == itemsD2.end())
 		{
-			return true;
+			return equal;
 		}
 		
-		if (it1 == itemsD1.end() || it2 == itemsD2.end())
-		{
-			return false;
-		}
+		string p1 = it1 != itemsD1.end() ? (*it1)->getPath() : string();
+		string p2 = it2 != itemsD2.end() ? (*it2)->getPath() : string();
 
-		if (!comparisonContext->compare(*it1, *it2))
+		if (p1 == p2)
 		{
-			return false;
-		}
+			if (!comparisonContext->compare(*it1, *it2))
+			{
+				equal = false;
+			}
 
-		it1++;
-		it2++;
+			it1++;
+			it2++;
+		}
+		else
+		{
+			equal = false;
+
+			if (p2.empty() || p1.compare(p2) < 0)
+			{
+				for (int i = 0; i < (*it1)->getLevel(); i++)
+				{
+					*(sp->getLog()) << "  ";
+				}
+
+				*(sp->getLog()) << p1 << " not in " << d2->getPath() << endl;
+
+				it1++;
+			}
+			else if (p1.empty() || p1.compare(p2) > 0)
+			{
+				for (int i = 0; i < (*it2)->getLevel(); i++)
+				{
+					*(sp->getLog()) << "  ";
+				}
+
+				*(sp->getLog()) << p2 << " not in " << d1->getPath() << endl;
+
+				it2++;
+			}
+		}
 	}
 }
 

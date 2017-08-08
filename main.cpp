@@ -2,6 +2,7 @@
 #include <vector>
 #include <memory>
 #include "platform.h"
+#include "gp_exception.h"
 #include "ItemFactory.h"
 #include "ComparisonStrategyFactory.h"
 #include "ComparisonContext.h"
@@ -13,7 +14,15 @@ int main(int argc, char** argv)
 	Commandline cl(argc - 1, argv + 1);
 	auto sp = make_shared<SystemParameters>();
 
-	cl.parse(sp);
+	try
+	{
+		cl.parse(sp);
+	}
+	catch (gp_exception e)
+	{
+		cerr << e.what() << endl;
+		return 1;
+	}
 
 	if (!sp->isValid(cerr))
 	{
@@ -59,7 +68,7 @@ int main(int argc, char** argv)
 	auto d2 = f->createDirectory(sp->getDirectory2());
 
 	bool equal = cc.compare(d1, d2);
-	cout << (equal ? "match" : "differ") << endl;
+	*(sp->getLog()) << (equal ? "match" : "differ") << endl;
 
 	return equal ? 0 : 1;
 }

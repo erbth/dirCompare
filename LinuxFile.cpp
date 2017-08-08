@@ -39,8 +39,6 @@ LinuxFile::LinuxFile(
 
 void LinuxFile::init()
 {
-	cout << "Trying to open LinuxFile " << path.c_str() << " ..." << endl;
-
 	int fd;
 
 	if (directory)
@@ -79,8 +77,6 @@ void LinuxFile::init()
 			errno,
 			"fault to create FILE stream for file: " + path);
 	}
-
-	cout << "LinuxFile " << path << " created" << endl;
 }
 
 LinuxFile::~LinuxFile()
@@ -89,8 +85,6 @@ LinuxFile::~LinuxFile()
 	{
 		throw errno_exception(errno);
 	}
-
-	cout << "LinuxFile " << path << " closed" << endl;
 }
 
 LinuxFileInfo LinuxFile::getFileInfo() const

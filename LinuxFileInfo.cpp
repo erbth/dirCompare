@@ -296,7 +296,7 @@ void LinuxFileInfo::print_summary(ostream& o) const
 	o << "ctime:        " << ctime(&t);
 }
 
-bool LinuxFileInfo::equivalent_to(LinuxFileInfo &f) const
+bool LinuxFileInfo::equivalent_to(LinuxFileInfo &f, string* reason) const
 {
 	if (isSocket() != f.isSocket() ||
 		isLink() != f.isLink() ||
@@ -306,45 +306,129 @@ bool LinuxFileInfo::equivalent_to(LinuxFileInfo &f) const
 		isCharacterDevice() != f.isCharacterDevice() ||
 		isFifo() != f.isFifo())
 	{
+		if (reason)
+		{
+			*reason = "type mismatch";
+		}
 		return false;
 	}
 
-	if (isUIDSet() != f.isUIDSet() ||
-		isGIDSet() != f.isGIDSet() ||
-		isSticky() != f.isSticky())
+	if (isUIDSet() != f.isUIDSet())
 	{
+		if (reason)
+		{
+			*reason = "UID flag mismatch";
+		}
+		return false;
+	}
+	
+	if (isGIDSet() != f.isGIDSet())
+	{
+		if (reason)
+		{
+			*reason = "GID flag mismatch";
+		}
 		return false;
 	}
 
-	if (getOwnerPermissions() != f.getOwnerPermissions() ||
-		getGroupPermissions() != f.getGroupPermissions() ||
-		getWorldPermissions() != f.getWorldPermissions())
+	if (isSticky() != f.isSticky())
 	{
+		if (reason)
+		{
+			*reason = "Sticky flag mismatch";
+		}
 		return false;
 	}
 
-	if (getUID() != f.getUID() ||
-		getGID() != f.getGID())
+	if (getOwnerPermissions() != f.getOwnerPermissions())
 	{
+		if (reason)
+		{
+			*reason = "owner permission differs";
+		}
+		return false;
+	}
+
+	if (getGroupPermissions() != f.getGroupPermissions())
+	{
+		if (reason)
+		{
+			*reason = "group permission differs";
+		}
+		return false;
+	}
+
+	if (getWorldPermissions() != f.getWorldPermissions())
+	{
+		if (reason)
+		{
+			*reason = "world permission differs";
+		}
+		return false;
+	}
+
+	if (getUID() != f.getUID())
+	{
+		if (reason)
+		{
+			*reason = "UID differs";
+		}
+		return false;
+	}
+
+	if (getGID() != f.getGID())
+	{
+		if (reason)
+		{
+			*reason = "GID differs";
+		}
 		return false;
 	}
 
 	if (getSpecialFileDeviceId() != f.getSpecialFileDeviceId())
 	{
+		if (reason)
+		{
+			*reason = "special file id differs";
+		}
 		return false;
 	}
 
 	if (getSize() != f.getSize())
 	{
+		if (reason)
+		{
+			*reason = "size differs";
+		}
 		return false;
 	}
 
-	if (getA_time() != f.getA_time() ||
-		getM_time() != f.getM_time() /* ||
-		getC_time() != f.getC_time() */)
+	if (getA_time() != f.getA_time())
 	{
+		if (reason)
+		{
+			*reason = "atime differs";
+		}
 		return false;
 	}
+
+	if (getM_time() != f.getM_time())
+	{
+		if (reason)
+		{
+			*reason = "mtime differes";
+		}
+		return false;
+	}
+	
+	/* if (getC_time() != f.getC_time())
+	{
+		if (reason)
+		{
+			*reason = "ctime differes";
+		}
+		return false;
+	} */
 
 	return true;
 }

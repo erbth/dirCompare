@@ -57,8 +57,7 @@ void Commandline::parse(shared_ptr<SystemParameters> param) const
 {
 	auto i = tokens.cbegin();
 
-	auto csf = createComparisonStrategyFactory(
-		make_shared<SystemParameters>());
+	auto csf = createComparisonStrategyFactory(param);
 
 	string logpath;
 
@@ -191,7 +190,7 @@ void Commandline::parse(shared_ptr<SystemParameters> param) const
 			}
 			else
 			{
-				throw gp_exception("unknown param->ter: " + k->getStr());
+				throw gp_exception("unknown parameter: " + k->getStr());
 			}
 		}
 		else
