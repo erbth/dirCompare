@@ -72,7 +72,7 @@ bool ComparisonContext::compare(
 
 				*(sp->getLog()) << "files " << f1->getPath() << " and "
 					<< f2->getPath() << " differ" << (reason.empty() ? "" :
-					"(reason: " + reason + ")") << endl;
+					" (reason: " + reason + ")") << endl;
 			}
 
 			return equal;
@@ -100,7 +100,7 @@ bool ComparisonContext::compare(
 
 				*(sp->getLog()) << "directories " << d1->getPath() << " and "
 					<< d2->getPath() << " differ" << (reason.empty() ? "" :
-					"(reason: " + reason + ")") << endl;
+					" (reason: " + reason + ")") << endl;
 			}
 
 			return equal;

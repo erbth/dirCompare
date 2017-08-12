@@ -8,7 +8,7 @@ PDFLATEX := pdflatex
 OBJDIR := bin
 DOCDIR := doc
 
-CXXFLAGS += -std=c++11 -gdwarf-2
+CXXFLAGS += -std=c++11 -gdwarf-2 -DWITH_TESTING
 LDFLAGS  += $(CXXFLAGS)
 TEXFLAGS += -synctex=1
 
@@ -17,8 +17,7 @@ TARGET_PLATFORM := $(LINUX)
 CXXFLAGS += -DTARGET_PLATFORM=$(TARGET_PLATFORM)
 
 TARGET = dirCompare
-OBJS   = main.o \
-		 ItemFactory.o \
+LIBOBJS= ItemFactory.o \
          Item.o \
 		 File.o \
 		 Directory.o \
@@ -43,7 +42,10 @@ OBJS   = main.o \
 		 ignoring.o \
 		 platform.o
 
-TESTS  = TEST_LEAKCHECK_MATCH \
+OBJS =   $(LIBOBJS) main.o
+
+TESTS  = TEST_CPPUNIT \
+		 # TEST_LEAKCHECK_MATCH \
 		 TEST_LEAKCHECK_DIFFER \
 		 TEST_MATCH \
 		 TEST_DIFFER
@@ -51,7 +53,7 @@ TESTS  = TEST_LEAKCHECK_MATCH \
 DOCS   = documentation.pdf
 
 .PHONY: all
-all: $(TARGET:%=$(OBJDIR)/%)
+all: $(TARGET:%=$(OBJDIR)/%) $(OBJDIR)/testing
 
 .PHONY: test
 test: $(TESTS)
@@ -61,6 +63,9 @@ doc: $(DOCS:%=$(DOCDIR)/%)
 
 $(TARGET:%=$(OBJDIR)/%): $(OBJS:%=$(OBJDIR)/%)
 	$(LD) $(LDFLAGS) -o $@ $^
+
+$(OBJDIR)/testing: $(OBJDIR)/testing.o $(LIBOBJS:%=$(OBJDIR)/%)
+	$(LD) $(LDFLAGS) `pkg-config --libs cppunit` -o $@ $^
 
 $(OBJDIR)/%.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -MMD -o $@ $<
@@ -72,29 +77,33 @@ $(OBJS:%=$(OBJDIR)/%): | $(OBJDIR)
 $(TARGET:%=$(OBJDIR)/%): | $(OBJDIR)
 
 .PHONY: TEST_LEAKCHECK_MATCH
-TEST_LEAKCHECK_MATCH: $(TARGET:%=$(OBJDIR)/%)
+TEST_LEAKCHECK_MATCH: $(TARGET:%=$(OBJDIR)/%) TEST_CPPUNIT
 	$(VALGRIND) --leak-check=full --error-exitcode=1 $< \
 		--dir1 testDir1 --dir2 testDir2 --fileStrategy simple --dirStrategy simple \
 		>/dev/null
 
 .PHONY: TEST_LEAKCHECK_DIFFER
-TEST_LEAKCHECK_DIFFER: $(TARGET:%=$(OBJDIR)/%)
+TEST_LEAKCHECK_DIFFER: $(TARGET:%=$(OBJDIR)/%) TEST_CPPUNIT
 	$(VALGRIND) --leak-check=full --error-exitcode=100 $< \
 		--dir1 testDir1 --dir2 testDir3 --fileStrategy simple --dirStrategy simple \
 		>/dev/null; \
 		test $$? -ne 100
 
 .PHONY: TEST_MATCH
-TEST_MATCH: $(TARGET:%=$(OBJDIR)/%)
+TEST_MATCH: $(TARGET:%=$(OBJDIR)/%) TEST_CPPUNIT
 	$< --dir1 testDir1 --dir2 testDir2 --fileStrategy simple --dirStrategy simple \
 	> /dev/null; \
 	test $$? -eq 0
 
 .PHONY: TEST_DIFFER
-TEST_DIFFER: $(TARGET:%=$(OBJDIR)/%)
+TEST_DIFFER: $(TARGET:%=$(OBJDIR)/%) TEST_CPPUNIT
 	$< --dir1 testDir1 --dir2 testDir3 --fileStrategy simple --dirStrategy simple \
 	> /dev/null; \
 	test $$? -ne 0
+
+.PHONY: TEST_CPPUNIT
+TEST_CPPUNIT: $(OBJDIR)/testing
+	$(OBJDIR)/testing
 
 $(OBJDIR):
 	mkdir -p $(OBJDIR)
