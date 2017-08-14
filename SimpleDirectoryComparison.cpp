@@ -76,7 +76,18 @@ bool SimpleDirectoryComparison::compare(
 					*(sp->getLog()) << "  ";
 				}
 
-				*(sp->getLog()) << p1 << " not in " << d2->getPath() << endl;
+				string type;
+
+				if (dynamic_pointer_cast<File>(*it1) == *it1)
+				{
+					type = "file ";
+				}
+				else if (dynamic_pointer_cast<Directory>(*it1) == *it1)
+				{
+					type = "directory ";
+				}
+
+				*(sp->getLog()) << type << p1 << " not in " << d2->getPath() << endl;
 
 				it1++;
 			}
@@ -87,7 +98,18 @@ bool SimpleDirectoryComparison::compare(
 					*(sp->getLog()) << "  ";
 				}
 
-				*(sp->getLog()) << p2 << " not in " << d1->getPath() << endl;
+				string type;
+
+				if (dynamic_pointer_cast<File>(*it1) == *it1)
+				{
+					type = "file ";
+				}
+				else if (dynamic_pointer_cast<Directory>(*it1) == *it1)
+				{
+					type = "directory ";
+				}
+
+				*(sp->getLog()) << type << p2 << " not in " << d1->getPath() << endl;
 
 				it2++;
 			}

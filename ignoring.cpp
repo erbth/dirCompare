@@ -1,3 +1,4 @@
+#include <ostream>
 #include <memory>
 #include <vector>
 #include <string>
@@ -9,8 +10,8 @@
 #include "ignoring.h"
 
 /* prototypes */
-static void computeBorders(int* border, int m, char* s);
-static int KMP(char* t, int n, char* s, int m);
+static int KMP(const char* t, int n, const char* s, int m);
+static void computeBorders(int* border, int m, const char* s);
 
 static bool match(const string& cpptext, const string& cpppattern)
 {
@@ -63,39 +64,64 @@ static bool match(const string& cpptext, const string& cpppattern)
 		}
 	}
 
+	/* offset in pattern */
+	j = 0;
+
 	/* alpha */
 	if (starPositions[0] > 0)
 	{
-		for (j = 0; j < starPositions[0]; j++)
+		int i;
+
+		for (i = 0; i < starPositions[0]; i++)
 		{
-			if (pattern[j] != text[j])
+			if (pattern[i] != text[i])
 			{
 				return false;
 			}
 		}
 
-		pattern += j;
-		text += j;
-		m -= j;
-		n -= j;
+		j = i;
+		text += i;
+		m -= i;
+		n -= i;
 	}
 
 	/* omega */
-	if (starPositions[cStars - 1] < m - 1)
+	if (starPositions[cStars - 1] - j < m - 1)
 	{
-		for (j = 1; j <= m - (starPositions[cStars - 1] + 1); j++)
+		int i;
+
+		for (i = 1; i <= m - (starPositions[cStars - 1] + 1 - j); i++)
 		{
-			if (pattern[m - j] != text[n - j])
+			if (pattern[m - i + j] != text[n - i])
 			{
 				return false;
 			}
 		}
 
-		m -= j - 1;
-		n -= j - 1;
+		m -= i - 1;
+		n -= i - 1;
 	}
 
 	/* sigmata */
+	for (int k = 0; k < cStars - 1; k++)
+	{
+		int subPatternLength = starPositions[k + 1] - starPositions[k] - 1;
+
+		int i = KMP(
+			text,
+			n,
+			pattern + starPositions[k] + 1,
+			subPatternLength);
+
+		if (i < 0)
+		{
+			return false;
+		}
+
+		text += i + subPatternLength;
+		n -= i + subPatternLength;
+	}
 
 	return true;
 }
@@ -103,19 +129,25 @@ static bool match(const string& cpptext, const string& cpppattern)
 #ifdef WITH_TESTING
 bool ignoring_match_test(const string& cpptext, const string& cpppattern)
 {
-	match(cpppattern, cpptext);
+	match(cpptext, cpppattern);
 }
 #endif
 
-/* the following implementation of the Knuth-Morris-Pratt-algorithm
+/* The following implementation of the Knuth-Morris-Pratt-algorithm
  * was taken from the lecture "Grundlagen Algorthmen und Datenstrukturen"
- * at Techische Universität München 2017 */
-static int KMP(char* t, int n, char* s, int m)
+ * at Techische Universität München 2017, with some modifications to have
+ * the epsilon pattern matching. */
+static int KMP(const char* t, int n, const char* s, int m)
 {
 	int border[m + 1];
 	computeBorders(border, m, s);
 	int i = 0;
 	int j = 0;
+
+	if (m == 0)
+	{
+		return 0;
+	}
 
 	while (i <= n - m)
 	{
@@ -135,7 +167,7 @@ static int KMP(char* t, int n, char* s, int m)
 	return -1;
 }
 
-static void computeBorders(int* border, int m, char* s)
+static void computeBorders(int* border, int m, const char* s)
 {
 	border[0] = -1;
 	border[1] = 0;

@@ -45,10 +45,11 @@ LIBOBJS= ItemFactory.o \
 OBJS =   $(LIBOBJS) main.o
 
 TESTS  = TEST_CPPUNIT \
-		 # TEST_LEAKCHECK_MATCH \
+		 TEST_LEAKCHECK_MATCH \
 		 TEST_LEAKCHECK_DIFFER \
 		 TEST_MATCH \
-		 TEST_DIFFER
+		 TEST_DIFFER \
+		 TEST_LEAKCHECK_IGNORE
 
 DOCS   = documentation.pdf
 
@@ -100,6 +101,13 @@ TEST_DIFFER: $(TARGET:%=$(OBJDIR)/%) TEST_CPPUNIT
 	$< --dir1 testDir1 --dir2 testDir3 --fileStrategy simple --dirStrategy simple \
 	> /dev/null; \
 	test $$? -ne 0
+
+.PHONY: TEST_LEAKCHECK_IGNORE
+TEST_LEAKCHECK_IGNORE: $(TARGET:%=$(OBJDIR)/%) TEST_CPPUNIT
+	$(VALGRIND) --leak-check=full --error-exitcode=100 $< \
+		--dir1 testDir1 --dir2 testDir3 --fileStrategy simple --dirStrategy simple \
+		--ignoreFile "test1.5" --ignoreDir "testDir2" >/dev/null; \
+		test $$? -ne 100
 
 .PHONY: TEST_CPPUNIT
 TEST_CPPUNIT: $(OBJDIR)/testing
