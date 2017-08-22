@@ -1,0 +1,4 @@
+	- handle file/directory opening errors
+	- cmake
+	- apply license
+	- implement Windows classes / wstring, umlauts!

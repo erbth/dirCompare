@@ -11,22 +11,20 @@ using namespace std;
 class errno_exception : public exception
 {
 private:
-	const char *msg;
+	const string msg;
 
 public:
-	errno_exception(int en)
+	errno_exception(int en) : msg(string(strerror(en)))
 	{
-		msg = strerror(en);
 	}
 
-	errno_exception(int en, string str)
+	errno_exception(int en, string str) : msg(str + string(strerror(en)))
 	{
-		msg = (str + string(strerror(en))).c_str();
 	}
 
 	virtual const char* what() const throw() override
 	{
-		return msg;
+		return msg.c_str();
 	}
 };
 

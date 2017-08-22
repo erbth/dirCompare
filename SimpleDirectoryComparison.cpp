@@ -3,6 +3,7 @@
 #include <memory>
 #include "SystemParameters.h"
 #include "gp_exception.h"
+#include "log.h"
 #include "Item.h"
 #include "Directory.h"
 #include "SimpleDirectoryComparison.h"
@@ -69,12 +70,9 @@ bool SimpleDirectoryComparison::compare(
 		{
 			equal = false;
 
-			if (p2.empty() || p1.compare(p2) < 0)
+			if (p2.empty() || !p1.empty() && p1.compare(p2) < 0)
 			{
-				for (int i = 0; i < (*it1)->getLevel(); i++)
-				{
-					*(sp->getLog()) << "  ";
-				}
+				logIndentation(sp->getLog(), *it1);
 
 				string type;
 
@@ -91,20 +89,17 @@ bool SimpleDirectoryComparison::compare(
 
 				it1++;
 			}
-			else if (p1.empty() || p1.compare(p2) > 0)
+			else if (p1.empty() || !p2.empty() && p1.compare(p2) > 0)
 			{
-				for (int i = 0; i < (*it2)->getLevel(); i++)
-				{
-					*(sp->getLog()) << "  ";
-				}
+				logIndentation(sp->getLog(), *it2);
 
 				string type;
 
-				if (dynamic_pointer_cast<File>(*it1) == *it1)
+				if (dynamic_pointer_cast<File>(*it2) == *it2)
 				{
 					type = "file ";
 				}
-				else if (dynamic_pointer_cast<Directory>(*it1) == *it1)
+				else if (dynamic_pointer_cast<Directory>(*it2) == *it2)
 				{
 					type = "directory ";
 				}

@@ -8,7 +8,84 @@
 #include <cppunit/BriefTestProgressListener.h>
 #include "ignoring_testing.h"
 
+#include <memory>
+#include <string>
+#include "ItemFactory.h"
+#include "LinuxItemFactory.h"
+#include "File.h"
+#include "Directory.h"
+#include "InvalidItem.h"
+#include "LinuxFile.h"
+#include "LinuxDirectory.h"
+
 using namespace CPPUNIT_NS;
+
+class LinuxItemFactoryTest : public TestFixture
+{
+	CPPUNIT_TEST_SUITE(LinuxItemFactoryTest);
+
+	CPPUNIT_TEST(nonexisting_file);
+	CPPUNIT_TEST(existing_file);
+	CPPUNIT_TEST(nonexisting_directory);
+	CPPUNIT_TEST(existing_directory);
+
+	CPPUNIT_TEST_SUITE_END();
+
+private:
+	shared_ptr<ItemFactory> factory;
+	shared_ptr<SystemParameters> sp;
+
+public:
+	void setUp() override
+	{
+		sp = make_shared<SystemParameters>();
+		factory = make_shared<LinuxItemFactory>(sp);
+	}
+
+	void nonexisting_file()
+	{
+		shared_ptr<File> f = factory->createFile("LinuxItemFactory.cpp1");
+
+		CPPUNIT_ASSERT(dynamic_pointer_cast<InvalidItem>(f) != nullptr);
+		CPPUNIT_ASSERT(dynamic_pointer_cast<LinuxFile>(f) == nullptr);
+
+		auto invalid = dynamic_pointer_cast<InvalidItem>(f);
+
+		CPPUNIT_ASSERT(invalid->getErrorDescription() ==
+			"Unable to open file \"LinuxItemFactory.cpp1\": "
+			"No such file or directory");
+	}
+
+	void existing_file()
+	{
+		shared_ptr<File> f = factory->createFile("LinuxItemFactory.cpp");
+
+		CPPUNIT_ASSERT(dynamic_pointer_cast<InvalidItem>(f) == nullptr);
+		CPPUNIT_ASSERT(dynamic_pointer_cast<LinuxFile>(f) != nullptr);
+	}
+
+	void nonexisting_directory()
+	{
+		shared_ptr<Directory> d = factory->createDirectory("docsd");
+
+		CPPUNIT_ASSERT(dynamic_pointer_cast<InvalidItem>(d) != nullptr);
+		CPPUNIT_ASSERT(dynamic_pointer_cast<LinuxDirectory>(d) == nullptr);
+
+		auto invalid = dynamic_pointer_cast<InvalidItem>(d);
+
+		CPPUNIT_ASSERT(invalid->getErrorDescription() ==
+			"Unable to open directory \"docsd\": "
+			"No such file or directory");
+	}
+
+	void existing_directory()
+	{
+		shared_ptr<Directory> d = factory->createDirectory("doc");
+
+		CPPUNIT_ASSERT(dynamic_pointer_cast<InvalidItem>(d) == nullptr);
+		CPPUNIT_ASSERT(dynamic_pointer_cast<LinuxDirectory>(d) != nullptr);
+	}
+};
 
 class IgnoringTest : public TestFixture
 {
@@ -216,6 +293,7 @@ public:
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(IgnoringTest);
+CPPUNIT_TEST_SUITE_REGISTRATION(LinuxItemFactoryTest);
 
 int main(int argc, char** argv)
 {

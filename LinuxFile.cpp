@@ -55,9 +55,7 @@ void LinuxFile::init()
 
 	if (fd < 0)
 	{
-		throw errno_exception(
-			errno,
-			"failed to open file " + path + ": ");
+		throw errno_exception(errno);
 	}
 		
 	/* create FILE stream */
@@ -69,13 +67,11 @@ void LinuxFile::init()
 		{
 			throw errno_exception(
 				errno,
-				"fault to close fd, latter caused by error in initialization of file "
-				+ path + ": ");
+				"failed to close fd, "
+				"closing triggered by error in initialization of file: ");
 		}
 
-		throw errno_exception(
-			errno,
-			"fault to create FILE stream for file: " + path);
+		throw errno_exception(errno, "failed to create FILE stream: ");
 	}
 }
 

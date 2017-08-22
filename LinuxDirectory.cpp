@@ -2,9 +2,11 @@
 #include <vector>
 #include <memory>
 #include <algorithm>
+#include <exception>
 #include "SystemParameters.h"
 #include "errno_exception.h"
 #include "gp_exception.h"
+#include "log.h"
 #include "Item.h"
 #include "Directory.h"
 #include "LinuxDirectory.h"
@@ -56,9 +58,7 @@ void LinuxDirectory::init()
 
 	if (fd < 0)
 	{
-		throw errno_exception(
-			errno,
-			"failed to open directory " + path + ": ");
+		throw errno_exception(errno);
 	}
 
 	/* create DIR stream */
@@ -70,13 +70,11 @@ void LinuxDirectory::init()
 		{
 			throw errno_exception(
 				errno,
-				"failed to close fd, closing triggered by initialization error of "
-				+ path + ": ");
+				"failed to close fd, "
+				"closing triggered by error in initialization of directory: ");
 		}
 
-		throw errno_exception(
-			errno,
-			"failed to create DIR stream for " + path + ": ");
+		throw errno_exception(errno, "failed to create DIR stream: ");
 	}
 
 	if (!getFileInfo().isDirectory())
@@ -85,10 +83,10 @@ void LinuxDirectory::init()
 		{
 			throw errno_exception(
 				errno,
-				"Failed to close directory " + path + " (initialization error): ");
+				"Failed to close directory (triggerd by initialization error): ");
 		}
 
-		throw gp_exception(path + string(" Is not a directory."));
+		throw gp_exception("Is not a directory.");
 	}
 }
 
@@ -163,10 +161,24 @@ vector<shared_ptr<Item>> LinuxDirectory::getItems() const
 			}
 			else
 			{
-				auto f = make_shared<LinuxFile>(
-					result->d_name,
-					sp,
-					shared_from_this());
+				shared_ptr<LinuxFile> f;
+
+				try
+				{
+					f = make_shared<LinuxFile>(
+						result->d_name,
+						sp,
+						shared_from_this());
+				}
+				catch (exception& e)
+				{
+					logIndentation(sp->getLog(), shared_from_this());
+
+					*(sp->getLog()) << "Directory " << path <<
+						": Error: " << e.what() << endl;
+
+					continue;
+				}
 
 				if (result->d_type == DT_UNKNOWN)
 				{

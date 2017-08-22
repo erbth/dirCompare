@@ -7,6 +7,7 @@
 #include "Directory.h"
 #include "FileComparisonStrategy.h"
 #include "DirectoryComparisonStrategy.h"
+#include "log.h"
 #include "ComparisonContext.h"
 
 ComparisonContext::ComparisonContext(shared_ptr<SystemParameters> sp)
@@ -65,10 +66,7 @@ bool ComparisonContext::compare(
 
 			if (!equal)
 			{
-				for (int i = 0; i < f1->getLevel(); i++)
-				{
-					*(sp->getLog()) << "  ";
-				}
+				logIndentation(sp->getLog(), f1);
 
 				*(sp->getLog()) << "files " << f1->getPath() << " and "
 					<< f2->getPath() << " differ" << (reason.empty() ? "" :
@@ -93,10 +91,7 @@ bool ComparisonContext::compare(
 
 			if (!equal)
 			{
-				for (int i = 0; i < d1->getLevel(); i++)
-				{
-					*(sp->getLog()) << "  ";
-				}
+				 logIndentation(sp->getLog(), d1);
 
 				*(sp->getLog()) << "directories " << d1->getPath() << " and "
 					<< d2->getPath() << " differ" << (reason.empty() ? "" :

@@ -21,7 +21,7 @@ public:
 
 	virtual ~File();
 
-	virtual ostream& dump(ostream& o) const
+	virtual ostream& dump(ostream& o) const override
 	{
 		return o << "File: " << path;
 	}

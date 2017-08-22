@@ -21,6 +21,9 @@ LIBOBJS= ItemFactory.o \
          Item.o \
 		 File.o \
 		 Directory.o \
+		 InvalidItem.o \
+		 InvalidFile.o \
+		 InvalidDirectory.o \
 		 LinuxFile.o \
 		 LinuxDirectory.o \
 		 LinuxItemFactory.o \
@@ -40,11 +43,12 @@ LIBOBJS= ItemFactory.o \
 		 Keyword.o \
 		 Commandline.o \
 		 ignoring.o \
-		 platform.o
+		 platform.o \
+		 log.o
 
 OBJS =   $(LIBOBJS) main.o
 
-TESTS  = TEST_CPPUNIT \
+TESTS  = TEST_CPPUNIT #\
 		 TEST_LEAKCHECK_MATCH \
 		 TEST_LEAKCHECK_DIFFER \
 		 TEST_MATCH \
@@ -54,7 +58,7 @@ TESTS  = TEST_CPPUNIT \
 DOCS   = documentation.pdf
 
 .PHONY: all
-all: $(TARGET:%=$(OBJDIR)/%) $(OBJDIR)/testing
+all: $(TARGET:%=$(OBJDIR)/%)
 
 .PHONY: test
 test: $(TESTS)
