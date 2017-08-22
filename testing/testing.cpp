@@ -58,7 +58,7 @@ public:
 
 	void existing_file()
 	{
-		shared_ptr<File> f = factory->createFile("LinuxItemFactory.cpp");
+		shared_ptr<File> f = factory->createFile("testing");
 
 		CPPUNIT_ASSERT(dynamic_pointer_cast<InvalidItem>(f) == nullptr);
 		CPPUNIT_ASSERT(dynamic_pointer_cast<LinuxFile>(f) != nullptr);
@@ -80,7 +80,7 @@ public:
 
 	void existing_directory()
 	{
-		shared_ptr<Directory> d = factory->createDirectory("doc");
+		shared_ptr<Directory> d = factory->createDirectory(".");
 
 		CPPUNIT_ASSERT(dynamic_pointer_cast<InvalidItem>(d) == nullptr);
 		CPPUNIT_ASSERT(dynamic_pointer_cast<LinuxDirectory>(d) != nullptr);

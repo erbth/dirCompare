@@ -210,6 +210,10 @@ void Commandline::parse(shared_ptr<SystemParameters> param) const
 
 				param->ignoreDirectory(v->getStr());
 			}
+			else if (k->getStr() == "help")
+			{
+				param->setHelp(true);
+			}
 			else
 			{
 				throw gp_exception("unknown parameter: " + k->getStr());
@@ -221,7 +225,7 @@ void Commandline::parse(shared_ptr<SystemParameters> param) const
 		}
 	}
 
-	if (!logpath.empty() && !param->getListStrategies())
+	if (!logpath.empty() && !param->getListStrategies() && !param->getHelp())
 	{
 		auto log = make_shared<ofstream>(
 			logpath,

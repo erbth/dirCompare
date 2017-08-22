@@ -3,6 +3,7 @@
 
 #include <string>
 #include <memory>
+#include "dirCompareConfig.h"
 #include "Item.h"
 #include "SystemParameters.h"
 

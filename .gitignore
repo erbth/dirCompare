@@ -1,5 +1,5 @@
-# binary dir
-bin
+# build dir
+build
 
 # vim .swp files
 *.swp

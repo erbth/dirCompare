@@ -2,6 +2,7 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include "dirCompareConfig.h"
 #include "gp_exception.h"
 #include "Item.h"
 #include "File.h"

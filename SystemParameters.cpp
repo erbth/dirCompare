@@ -13,7 +13,8 @@ using namespace std;
 SystemParameters::SystemParameters() :
 	listStrategies(false),
 	log(&cout, [](ostream*){}),
-	externalLog(false)
+	externalLog(false),
+	help(false)
 {
 }
 
@@ -57,6 +58,11 @@ shared_ptr<ostream> SystemParameters::getLog() const
 	return log;
 }
 
+bool SystemParameters::getHelp() const
+{
+	return help;
+}
+
 void SystemParameters::setDirectory1(string dir)
 {
 	directory1 = dir;
@@ -88,9 +94,14 @@ void SystemParameters::setLog(shared_ptr<ostream> l)
 	externalLog = true;
 }
 
+void SystemParameters::setHelp(bool help)
+{
+	this->help = help;
+}
+
 bool SystemParameters::isValid(ostream& errors) const
 {
-	if (listStrategies)
+	if (listStrategies || help)
 	{
 		return true;
 	}

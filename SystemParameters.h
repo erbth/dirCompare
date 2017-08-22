@@ -23,6 +23,7 @@ protected:
 	vector<string> ignoreDirectories;
 	shared_ptr<ostream> log;
 	bool externalLog;
+	bool help;
 
 public:
 	SystemParameters();
@@ -35,6 +36,7 @@ public:
 	const vector<string> getIgnoreFiles() const;
 	const vector<string> getIgnoreDirectories() const;
 	shared_ptr<ostream> getLog() const;
+	bool getHelp() const;
 
 	void setDirectory1(string dir);
 	void setDirectory2(string dir);
@@ -42,6 +44,7 @@ public:
 	void setFileComparisonStrategy(const string s);
 	void setDirectoryComparisonStrategy(const string s);
 	void setLog(shared_ptr<ostream> l);
+	void setHelp(bool help);
 
 	bool isValid(ostream& errors) const;
 	bool isExternalLogSet() const;

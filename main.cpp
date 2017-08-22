@@ -2,6 +2,7 @@
 #include <vector>
 #include <memory>
 #include <exception>
+#include "dirCompareConfig.h"
 #include "platform.h"
 #include "gp_exception.h"
 #include "ItemFactory.h"
@@ -10,7 +11,28 @@
 #include "Commandline.h"
 #include "SystemParameters.h"
 
-int dirCompare(int argc, char** argv)
+static void printHelp()
+{
+	cout << "This is dirCompare version " << DIR_COMPARE_VERSION_MAJOR
+		<< "." << DIR_COMPARE_VERSION_MINOR <<
+		" by Thomas Erbesdobler <t.erbesdobler@team103.com>" << endl << endl;
+
+	cout << "Parameter summary:" << endl;
+	cout << "--help" << endl;
+	cout << "--dir1 <path>" << endl;
+	cout << "--dir2 <path>" << endl;
+	cout << "--listStrategies" << endl;
+	cout << "--fileStrategy <id>" << endl;
+	cout << "--dirStrategy <id>" << endl;
+	cout << "--ignoreFile <name>" << endl;
+	cout << "--ignoreDir <name>" << endl;
+	cout << "--logfile <path>" << endl;
+
+	cout << endl << "For further information please consult the "
+		"documentation." << endl;
+}
+
+static int dirCompare(int argc, char** argv)
 {
 	Commandline cl(argc - 1, argv + 1);
 	auto sp = make_shared<SystemParameters>();
@@ -27,25 +49,18 @@ int dirCompare(int argc, char** argv)
 
 	if (!sp->isValid(cerr))
 	{
-		cerr << endl << "invalid parameters, exiting." << endl;
+		cerr << endl << "invalid parameters, exiting. "
+			"Maybe give --help a try?" << endl;
+
 		return 1;
 	}
 
-	cout << endl << "ignored files:" << endl;
-	for (auto f : sp->getIgnoreFiles())
+	if (sp->getHelp())
 	{
-		cout << f << endl;
+		printHelp();
+		return 0;
 	}
-
-	cout << endl << "ignored directories:" << endl;
-	for (auto d : sp->getIgnoreDirectories())
-	{
-		cout << d << endl;
-	}
-
-	cout << endl;
-
-	if (sp->getListStrategies())
+	else if (sp->getListStrategies())
 	{
 		auto csf = createComparisonStrategyFactory(sp);
 
@@ -72,6 +87,20 @@ int dirCompare(int argc, char** argv)
 	}
 	else
 	{
+		cout << endl << "ignored files:" << endl;
+		for (auto f : sp->getIgnoreFiles())
+		{
+			cout << f << endl;
+		}
+
+		cout << endl << "ignored directories:" << endl;
+		for (auto d : sp->getIgnoreDirectories())
+		{
+			cout << d << endl;
+		}
+
+		cout << endl;
+
 		auto csf = createComparisonStrategyFactory(sp);
 
 		auto fileStrategy = csf->createFileStrategy(

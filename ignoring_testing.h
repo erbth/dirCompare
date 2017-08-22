@@ -1,6 +1,8 @@
 #ifndef _IGNORING_TESTING_H
 #define _IGNORING_TESTING_H
 
+#include "dirCompareConfig.h"
+
 #ifdef WITH_TESTING
 
 #include <string>
