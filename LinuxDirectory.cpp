@@ -26,7 +26,7 @@ extern "C"
 }
 
 LinuxDirectory::LinuxDirectory(const string& path, shared_ptr<SystemParameters> sp)
-	: Directory(path, sp)
+	: Directory(path, sp), dir(nullptr)
 {
 	init();
 }
@@ -35,7 +35,7 @@ LinuxDirectory::LinuxDirectory(
 	const string& path,
 	shared_ptr<SystemParameters> sp,
 	shared_ptr<const Directory> dir)
-	: Directory(path, sp, dir)
+	: Directory(path, sp, dir), dir(nullptr)
 {
 	init();
 }
@@ -92,9 +92,12 @@ void LinuxDirectory::init()
 
 LinuxDirectory::~LinuxDirectory()
 {
-	if (closedir(dir) < 0)
+	if (dir)
 	{
-		throw errno_exception(errno);
+		if (closedir(dir) < 0)
+		{
+			throw errno_exception(errno);
+		}
 	}
 }
 
@@ -154,9 +157,8 @@ vector<shared_ptr<Item>> LinuxDirectory::getItems() const
 
 			if (result->d_type == DT_DIR)
 			{
-				v.push_back(make_shared<LinuxDirectory>(
+				v.push_back(itemFactory->createDirectory(
 					result->d_name,
-					sp,
 					shared_from_this()));
 			}
 			else
@@ -165,9 +167,8 @@ vector<shared_ptr<Item>> LinuxDirectory::getItems() const
 
 				try
 				{
-					f = make_shared<LinuxFile>(
+					f = itemFactory->createFile(
 						result->d_name,
-						sp,
 						shared_from_this());
 				}
 				catch (exception& e)
@@ -184,9 +185,8 @@ vector<shared_ptr<Item>> LinuxDirectory::getItems() const
 				{
 					if (f->getFileInfo().isDirectory())
 					{
-						v.push_back(make_shared<LinuxDirectory>(
+						v.push_back(itemFactory->createDirectory(
 							result->d_name,
-							sp,
 							shared_from_this()));
 					}
 				}

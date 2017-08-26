@@ -21,7 +21,7 @@ class LinuxFile : public File
 {
 private:
 	void init();
-
+	
 protected:
 	FILE* file;
 
@@ -34,7 +34,7 @@ public:
 
 	virtual ~LinuxFile();
 
-	LinuxFileInfo getFileInfo() const;
+	virtual LinuxFileInfo getFileInfo() const;
 
 	virtual ostream& dump(ostream& o) const
 	{

@@ -1,4 +1,5 @@
-	- handle file/directory opening errors
-	- cmake
+	- handle file/directory opening errors: add ItemFactory to directory
+	  (already done in class diagram)
+	- cmake: system testing
 	- apply license
 	- implement Windows classes / wstring, umlauts!

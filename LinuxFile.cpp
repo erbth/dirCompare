@@ -23,7 +23,7 @@ extern "C"
 using namespace std;
 
 LinuxFile::LinuxFile(const string& path, shared_ptr<SystemParameters> sp)
-	: File(path, sp)
+	: File(path, sp), file(nullptr)
 {
 	init();
 }
@@ -32,7 +32,7 @@ LinuxFile::LinuxFile(
 	const string& path,
 	shared_ptr<SystemParameters> sp,
 	shared_ptr<const Directory> dir)
-	: File(path, sp, dir)
+	: File(path, sp, dir), file(nullptr)
 {
 	init();
 }
@@ -77,9 +77,12 @@ void LinuxFile::init()
 
 LinuxFile::~LinuxFile()
 {
-	if (fclose(file) < 0)
+	if (file)
 	{
-		throw errno_exception(errno);
+		if (fclose(file) < 0)
+		{
+			throw errno_exception(errno);
+		}
 	}
 }
 

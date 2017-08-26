@@ -116,29 +116,8 @@ static int dirCompare(int argc, char** argv)
 		auto f = createItemFactory(sp);
 
 		/* test directory */
-		shared_ptr<Directory> d1;
-
-		try
-		{
-			d1 = f->createDirectory(sp->getDirectory1());
-		}
-		catch (exception& e)
-		{
-			cerr << "unable to open directory 1:" << endl << e.what() << endl;
-			return 1;
-		}
-
-		shared_ptr<Directory> d2;
-		
-		try
-		{
-			d2 = f->createDirectory(sp->getDirectory2());
-		}
-		catch (exception& e)
-		{
-			cerr << "unable to open directory 2:" << endl << e.what() << endl;
-			return 1;
-		}
+		auto d1 = f->createDirectory(sp->getDirectory1());
+		auto d2 = f->createDirectory(sp->getDirectory2());
 
 		bool equal = cc.compare(d1, d2);
 		*(sp->getLog()) << (equal ? "match" : "differ") << endl;

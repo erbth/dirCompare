@@ -5,6 +5,7 @@
 #include <memory>
 #include "SystemParameters.h"
 #include "Directory.h"
+#include "ItemFactory.h"
 
 class ComparisonContext;
 

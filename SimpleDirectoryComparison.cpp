@@ -6,6 +6,7 @@
 #include "log.h"
 #include "Item.h"
 #include "Directory.h"
+#include "InvalidDirectory.h"
 #include "SimpleDirectoryComparison.h"
 #include "ComparisonContext.h"
 #include "ignoring.h"
@@ -26,8 +27,47 @@ bool SimpleDirectoryComparison::compare(
 		throw gp_exception("comparison context not set");
 	}
 
-	auto itemsD1 = d1->getItems();
-	auto itemsD2 = d2->getItems();
+	{
+		shared_ptr<const InvalidDirectory> id1;
+		
+		if ((id1 = dynamic_pointer_cast<const InvalidDirectory>(d1)) != nullptr)
+		{
+			*(sp->getLog()) << "Unable to open directory \"" << id1->getPath()
+				<< "\" in directory 1: " << id1->getErrorMessage() << endl;
+		}
+
+		shared_ptr<const InvalidDirectory> id2;
+		
+		if ((id2 = dynamic_pointer_cast<const InvalidDirectory>(d2)) != nullptr)
+		{
+			*(sp->getLog()) << "Unable to open directory \"" << id2->getPath()
+				<< "\" in directory 2: " << id2->getErrorMessage() << endl;
+		}
+
+		if (id1 || id2)
+		{
+			return false;
+		}
+	}
+
+	vector<shared_ptr<Item>> itemsD1;
+	vector<shared_ptr<Item>> itemsD2;
+	
+	try
+	{
+		itemsD1 = d1->getItems();
+		itemsD2 = d2->getItems();
+	}
+	catch (exception& e)
+	{
+		*(sp->getLog()) << "Error while retrieving items: " << e.what() << endl;
+		return false;
+	}
+	catch (...)
+	{
+		*(sp->getLog()) << "Unknown error while retrieving items." << endl;
+		return false;
+	}
 
 	auto it1 = itemsD1.cbegin();
 	auto it2 = itemsD2.cbegin();
@@ -85,7 +125,7 @@ bool SimpleDirectoryComparison::compare(
 					type = "directory ";
 				}
 
-				*(sp->getLog()) << type << p1 << " not in " << d2->getPath() << endl;
+				*(sp->getLog()) << type << p1 << " not in directory 2" << endl;
 
 				it1++;
 			}
@@ -104,7 +144,7 @@ bool SimpleDirectoryComparison::compare(
 					type = "directory ";
 				}
 
-				*(sp->getLog()) << type << p2 << " not in " << d1->getPath() << endl;
+				*(sp->getLog()) << type << p2 << " not in directory 1" << endl;
 
 				it2++;
 			}

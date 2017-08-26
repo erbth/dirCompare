@@ -1,6 +1,7 @@
 #include <memory>
 #include "SystemParameters.h"
 #include "ComparisonContext.h"
+#include "ItemFactory.h"
 #include "DirectoryComparisonStrategy.h"
 
 DirectoryComparisonStrategy::DirectoryComparisonStrategy(

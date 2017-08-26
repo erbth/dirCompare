@@ -17,7 +17,7 @@ public:
 	virtual bool compare(
 		shared_ptr<const File> f1,
 		shared_ptr<const File> f2,
-		string* reason = nullptr) const override;
+		string* reason = nullptr) const noexcept override;
 
 	virtual const string getID() const override;
 	virtual const string getDescription() const override;
