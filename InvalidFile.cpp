@@ -17,7 +17,7 @@ InvalidFile::InvalidFile(
 	const string& path,
 	shared_ptr<SystemParameters> sp,
 	shared_ptr<const Directory> dir)
-	: File(path, sp)
+	: File(path, sp, dir)
 {
 }
 

@@ -17,6 +17,9 @@ extern "C"
 
 using namespace std;
 
+class Directory;
+class LinuxItemFactory;
+
 class LinuxFile : public File
 {
 private:

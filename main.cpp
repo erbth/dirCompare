@@ -44,6 +44,7 @@ static int dirCompare(int argc, char** argv)
 	catch (gp_exception e)
 	{
 		cerr << e.what() << endl;
+		cerr << endl << "Maybe give --help a try?" << endl;
 		return 1;
 	}
 

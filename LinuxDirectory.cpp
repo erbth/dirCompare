@@ -3,12 +3,15 @@
 #include <memory>
 #include <algorithm>
 #include <exception>
+#include "platform.h"
 #include "SystemParameters.h"
 #include "errno_exception.h"
 #include "gp_exception.h"
 #include "log.h"
 #include "Item.h"
 #include "Directory.h"
+#include "ItemFactory.h"
+#include "LinuxItemFactory.h"
 #include "LinuxDirectory.h"
 #include "LinuxFile.h"
 #include "LinuxFileInfo.h"
@@ -137,6 +140,13 @@ vector<shared_ptr<Item>> LinuxDirectory::getItems() const
 	}
 
 	struct dirent *result;
+	shared_ptr<ItemFactory> itemFactory = createItemFactory(sp);
+
+	if (dynamic_pointer_cast<LinuxItemFactory>(itemFactory) == nullptr)
+	{
+		throw gp_exception("Not a createItemFactory has not produced a "
+			"LinuxItemFactory in LinuxDirectory");
+	}
 
 	for (;;)
 	{
@@ -167,9 +177,10 @@ vector<shared_ptr<Item>> LinuxDirectory::getItems() const
 
 				try
 				{
-					f = itemFactory->createFile(
-						result->d_name,
-						shared_from_this());
+					f = static_pointer_cast<LinuxFile>(
+						itemFactory->createFile(
+							result->d_name,
+							shared_from_this()));
 				}
 				catch (exception& e)
 				{

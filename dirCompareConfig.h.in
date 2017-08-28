@@ -1,10 +1,18 @@
 #ifndef _DIR_COMPARE_CONFIG_H
 #define _DIR_COMPARE_CONFIG_H
 
+/* Project version */
 #define DIR_COMPARE_VERSION_MAJOR @DIR_COMPARE_VERSION_MAJOR@
 #define DIR_COMPARE_VERSION_MINOR @DIR_COMPARE_VERSION_MINOR@
 
+/* Symbolic constants for target platforms */
+#define LINUX 1
+#define WIN32 2
+
+/* Target platform */
 #define TARGET_PLATFORM @TARGET_PLATFORM@
+
+/* Testing */
 #cmakedefine WITH_TESTING
 
 #endif /* _DIR_COMPARE_CONFIG_H */

@@ -32,6 +32,8 @@ bool SimpleDirectoryComparison::compare(
 		
 		if ((id1 = dynamic_pointer_cast<const InvalidDirectory>(d1)) != nullptr)
 		{
+			logIndentation(sp->getLog(), id1);
+
 			*(sp->getLog()) << "Unable to open directory \"" << id1->getPath()
 				<< "\" in directory 1: " << id1->getErrorMessage() << endl;
 		}
@@ -40,6 +42,8 @@ bool SimpleDirectoryComparison::compare(
 		
 		if ((id2 = dynamic_pointer_cast<const InvalidDirectory>(d2)) != nullptr)
 		{
+			logIndentation(sp->getLog(), id2);
+
 			*(sp->getLog()) << "Unable to open directory \"" << id2->getPath()
 				<< "\" in directory 2: " << id2->getErrorMessage() << endl;
 		}
@@ -60,11 +64,15 @@ bool SimpleDirectoryComparison::compare(
 	}
 	catch (exception& e)
 	{
+		logIndentation(sp->getLog(), d1);
+
 		*(sp->getLog()) << "Error while retrieving items: " << e.what() << endl;
 		return false;
 	}
 	catch (...)
 	{
+		logIndentation(sp->getLog(), d1);
+
 		*(sp->getLog()) << "Unknown error while retrieving items." << endl;
 		return false;
 	}

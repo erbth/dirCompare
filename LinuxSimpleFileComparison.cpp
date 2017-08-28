@@ -1,6 +1,7 @@
 #include <string>
 #include <memory>
 #include "SystemParameters.h"
+#include "log.h"
 #include "File.h"
 #include "LinuxFile.h"
 #include "InvalidFile.h"
@@ -38,13 +39,19 @@ bool LinuxSimpleFileComparison::compare(
 			}
 			catch (exception& e)
 			{
-				*(sp->getLog()) << "Error while comparing file \"" <<
-					lf1->getPath() << "\": " << e.what() << endl;
+				logIndentation(sp->getLog(), lf1);
+
+				*(sp->getLog()) << "Error while comparing files \"" <<
+					lf1->getPath() << "\", \"" << lf2->getPath() <<
+					"\": " << e.what() << endl;
 			}
 			catch (...)
 			{
-				*(sp->getLog()) << "Unknown error while comparing file \"" <<
-					lf1->getPath() << endl;
+				logIndentation(sp->getLog(), lf1);
+
+				*(sp->getLog()) << "Unknown error while comparing files \"" <<
+					lf1->getPath() << "\", \"" << lf2->getPath() <<
+					"\"" << endl;
 			}
 		}
 	}
@@ -54,6 +61,8 @@ bool LinuxSimpleFileComparison::compare(
 
 		if ((if1 = dynamic_pointer_cast<const InvalidFile>(f1)) != nullptr)
 		{
+			logIndentation(sp->getLog(), if1);
+
 			*(sp->getLog()) << "Unable to open file \"" << if1->getPath()
 				<< "\" in directory 1: " << if1->getErrorMessage() << endl;
 		}
@@ -62,6 +71,8 @@ bool LinuxSimpleFileComparison::compare(
 
 		if ((if2 = dynamic_pointer_cast<const InvalidFile>(f2)) != nullptr)
 		{
+			logIndentation(sp->getLog(), if2);
+
 			*(sp->getLog()) << "Unable to open file \"" << if2->getPath()
 				<< "\" in directory 2: " << if2->getErrorMessage() << endl;
 		}

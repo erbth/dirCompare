@@ -1,10 +1,6 @@
 #ifndef _PLATFORM_H
 #define _PLATFORM_H
 
-/* symbolic constants for target platforms */
-#define LINUX 1
-#define WIN32 2
-
 #include <memory>
 #include "SystemParameters.h"
 #include "ItemFactory.h"

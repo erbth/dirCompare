@@ -3,3 +3,6 @@ build
 
 # vim .swp files
 *.swp
+
+# test directories
+testDir*
