@@ -1,3 +1,20 @@
+% This file is part of dirCompare
+%
+% Copyright 2017 Thomas Erbesdobler <t.erbesdobler@team103.com>
+%
+% Licensed under the Apache License, Version 2.0 (the "License");
+% you may not use this file except in compliance with the License.
+% You may obtain a copy of the License at
+%
+%     http://www.apache.org/licenses/LICENSE-2.0
+%
+% Unless required by applicable law or agreed to in writing, software
+% distributed under the License is distributed on an "AS IS" BASIS,
+% WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+% See the License for the specific language governing permissions and
+% limitations under the License.
+%
+
 % !TeX spellcheck = en_US
 \documentclass[a4paper]{article}
 \usepackage[hidelinks]{hyperref}
@@ -5,10 +22,11 @@
 \usepackage{color}
 
 \title{Documentation for dirCompare}
-\author{Thomas Erbesdobler}
-\date{Last updated: \today}
+\author{Thomas Erbesdobler $<$t.erbesdobler@team103.com$>$}
+\date{Last updated: August 28, 2017}
 
 \setlength{\parskip}{1ex}
+\setlength{\parindent}{0pt}
 
 \newenvironment{note}{\color{magenta}}{\normalcolor}
 
@@ -19,9 +37,8 @@
 	\section{What is dirCompare?}
 	\label{sec:what_is_dircompare}
 	
-	''dirCompare'' is yet another open source tool for comparing directory trees. It is written in C++ and designed to be multi-platform with the capability to add more supported platforms quite easily. This is achieved using the abstract factory pattern.
+	''dirCompare'' is yet another open source tool for comparing directory trees. It is written in C++ and designed to be multi-platform with the capability to add more supported platforms quite easily. It is licensed under the Apache License, Version 2.0. The same license shall apply to this document, it shall be considered an object form of the \LaTeX{} code
 	
-	\noindent
 	No initial release has been done yet, furthermore licensing information has still to be added.
 	
 	\section{User documentation}
@@ -32,7 +49,6 @@
 	
 	The following table lists all available command line parameters and their semantics:
 	
-	\noindent
 	\begin{tabularx}{\linewidth}{l|X}
 		\texttt{--help} & Show brief help and licensing information \\
 		\texttt{--dir1 \textless path\textgreater} & Path to first directory for comparison \\
@@ -57,16 +73,33 @@
 	
 	\paragraph{Linux} The following file comparison strategies are currently available on the Linux platform:
 	
-	\noindent
 	\begin{tabularx}{\linewidth}{lX}
-		simple & Compares only the file parameters retrieved via \texttt{stat} except ctime, the inode number and device id. \begin{note} Is this true? \end{note} In case of a difference the reason is listed in the output log. However, not all inequalities are listed but only the first one compared and found unequal. This file comparison strategy performs no filtering, this has to be done by the used directory comparison strategy which is the only part of the system that can query files.
+		simple & Compares only the file parameters retrieved via \texttt{stat} except ctime, the count of allocated blocks and a few others. In case of a difference the reason is listed in the output log. However, not all inequalities are listed but only the first one compared and found unequal. This file comparison strategy performs no filtering, this has to be done by the used directory comparison strategy which is the only part of the system that can query files.
 	\end{tabularx}
 	
 	\paragraph{All target platforms} The following directory comparison strategies are currently available on any target platform:
 	
-	\noindent
 	\begin{tabularx}{\linewidth}{lX}
 		simple & Compares only the directory content in a recursive manner. That is, two directories differ exactly if not all items are the same. Two items are equal if they are considered equal by the associated comparison strategy and additionally have the same name. Since the reason for inequality is always the difference of content, none is listed in the log. But if items are present in only one directory, this is listed and also in which one. This directory comparison strategy applies the set file- and directory filter in respect to the items included in the actual directory.
 	\end{tabularx}
+	
+	\section{Licensing information}
+	\label{sec:licensing_information}
+	
+	Copyright 2017 Thomas Erbesdobler $<$t.erbesdobler@team103.com$>$
+	
+	Licensed under the Apache License, Version 2.0 (the ''License'');
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+	
+	\begin{center}
+		\url{http://www.apache.org/licenses/LICENSE-2.0}
+	\end{center}
+	
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an ''AS IS'' BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
 	
 \end{document}

@@ -31,8 +31,27 @@
 static void printHelp()
 {
 	cout << "This is dirCompare version " << DIR_COMPARE_VERSION_MAJOR
-		<< "." << DIR_COMPARE_VERSION_MINOR <<
-		" by Thomas Erbesdobler <t.erbesdobler@team103.com>" << endl << endl;
+		<< "." << DIR_COMPARE_VERSION_MINOR << endl << endl;
+
+	cout << "Copyright 2017 Thomas Erbesdobler <t.erbesdobler@team103.com>"
+		<< endl << endl;
+
+	cout << "Licensed under the Apache License, Version 2.0 (the \"License\");"
+		<< endl <<
+		"you may not use this file except in compliance with the License."
+		<< endl <<
+		"You may obtain a copy of the License at" << endl << endl <<
+		"    http://www.apache.org/licenses/LICENSE-2.0" << endl << endl <<
+
+	"Unless required by applicable law or agreed to in writing, software"
+	<< endl <<
+	"distributed under the License is distributed on an \"AS IS\" BASIS,"
+	<< endl <<
+	"WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied."
+	<< endl <<
+	"See the License for the specific language governing permissions and"
+	<< endl <<
+	"limitations under the License." << endl << endl;
 
 	cout << "Parameter summary:" << endl;
 	cout << "--help" << endl;
