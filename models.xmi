@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<XMI verified="false" xmi.version="1.2" timestamp="2017-08-28T18:12:24" xmlns:UML="http://schema.omg.org/spec/UML/1.3">
+<XMI verified="false" xmi.version="1.2" timestamp="2017-08-28T18:34:48" xmlns:UML="http://schema.omg.org/spec/UML/1.3">
  <XMI.header>
   <XMI.documentation>
    <XMI.exporter>umbrello uml modeller http://umbrello.kde.org</XMI.exporter>
@@ -1161,7 +1161,7 @@
      </UML:Namespace.ownedElement>
      <XMI.extension xmi.extender="umbrello">
       <diagrams>
-       <diagram showopsig="1" linecolor="#ff0000" snapx="25" showattribassocs="1" snapy="25" linewidth="0" showattsig="1" textcolor="#000000" isopen="1" showpackage="1" showpubliconly="0" showstereotype="1" name="ComparisonSubsystem" font="DejaVu Sans,9,-1,0,50,0,0,0,0,0" canvasheight="4561,61572265625" canvaswidth="7009,254089355469" localid="-1" snapcsgrid="0" showgrid="0" showops="1" griddotcolor="#d3d3d3" backgroundcolor="#ffffff" usefillcolor="1" fillcolor="#ffff00" zoom="20" xmi.id="i4rlyqvpEapy" documentation="" showscope="1" snapgrid="0" showatts="1" type="1">
+       <diagram showopsig="1" linecolor="#ff0000" snapx="25" showattribassocs="1" snapy="25" linewidth="0" showattsig="1" textcolor="#000000" isopen="1" showpackage="1" showpubliconly="0" showstereotype="1" name="ComparisonSubsystem" font="DejaVu Sans,9,-1,0,50,0,0,0,0,0" canvasheight="4561,61572265625" canvaswidth="7009,254089355469" localid="-1" snapcsgrid="0" showgrid="0" showops="1" griddotcolor="#d3d3d3" backgroundcolor="#ffffff" usefillcolor="1" fillcolor="#ffff00" zoom="72" xmi.id="i4rlyqvpEapy" documentation="" showscope="1" snapgrid="0" showatts="1" type="1">
         <widgets>
          <classwidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="0" showoperations="1" textcolor="#000000" usesdiagramusefillcolor="0" showpubliconly="0" showpackage="1" x="-3044,997802734375" showattsigs="601" showstereotype="1" y="-3254,129150390625" showattributes="1" font="DejaVu Sans,9,-1,0,50,0,0,0,0,0" localid="Bo8lAgWm8SeH" width="574" isinstance="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="HoX3PzOR0OT3" showscope="1" height="220" showopsigs="601"/>
          <classwidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="0" showoperations="1" textcolor="#000000" usesdiagramusefillcolor="0" showpubliconly="0" showpackage="1" x="-1732,649047851562" showattsigs="601" showstereotype="1" y="-2581,336181640625" showattributes="1" font="DejaVu Sans,9,-1,0,50,0,0,0,0,0" localid="QCj11H6b04nD" width="563" isinstance="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="MuRbBV53cvEf" showscope="1" height="110" showopsigs="601"/>
@@ -1432,7 +1432,7 @@
          </assocwidget>
         </associations>
        </diagram>
-       <diagram showopsig="1" linecolor="#ff0000" snapx="25" showattribassocs="1" snapy="25" linewidth="0" showattsig="1" textcolor="#000000" isopen="1" showpackage="1" showpubliconly="0" showstereotype="1" name="CommandlineParser" font="DejaVu Sans,9,-1,0,50,0,0,0,0,0" canvasheight="4096,769775390625" canvaswidth="4463,183291480655" localid="-1" snapcsgrid="0" showgrid="0" showops="1" griddotcolor="#d3d3d3" backgroundcolor="#ffffff" usefillcolor="1" fillcolor="#ffff00" zoom="78" xmi.id="VXzaKgUgIYBW" documentation="" showscope="1" snapgrid="0" showatts="1" type="1">
+       <diagram showopsig="1" linecolor="#ff0000" snapx="25" showattribassocs="1" snapy="25" linewidth="0" showattsig="1" textcolor="#000000" isopen="0" showpackage="1" showpubliconly="0" showstereotype="1" name="CommandlineParser" font="DejaVu Sans,9,-1,0,50,0,0,0,0,0" canvasheight="4096,769775390625" canvaswidth="4463,183291480655" localid="-1" snapcsgrid="0" showgrid="0" showops="1" griddotcolor="#d3d3d3" backgroundcolor="#ffffff" usefillcolor="1" fillcolor="#ffff00" zoom="78" xmi.id="VXzaKgUgIYBW" documentation="" showscope="1" snapgrid="0" showatts="1" type="1">
         <widgets>
          <classwidget linecolor="none" usesdiagramfillcolor="0" linewidth="0" showoperations="1" textcolor="#000000" usesdiagramusefillcolor="0" showpubliconly="0" showpackage="1" x="-790" showattsigs="601" showstereotype="1" y="-335" showattributes="1" font="DejaVu Sans,9,-1,0,50,0,0,0,0,0" localid="mcBvRLCwqBVA" width="365" isinstance="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="CvsBxE4I8lPH" showscope="1" height="100" showopsigs="601"/>
          <classwidget linecolor="none" usesdiagramfillcolor="0" linewidth="0" showoperations="1" textcolor="#000000" usesdiagramusefillcolor="0" showpubliconly="0" showpackage="1" x="-811" showattsigs="601" showstereotype="1" y="-139" showattributes="1" font="DejaVu Sans,9,-1,0,50,0,0,0,0,0" drawascircle="0" localid="gt7mcV1O7BHW" width="179" isinstance="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="pxq5V1bfuSop" showscope="1" height="100" showopsigs="601"/>
