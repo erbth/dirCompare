@@ -1,3 +1,2 @@
 	- cmake: system testing
-	- apply license
 	- implement Windows classes / wstring, umlauts!
