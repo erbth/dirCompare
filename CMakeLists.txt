@@ -23,8 +23,18 @@ set(DIR_COMPARE_VERSION_MAJOR 0)
 set(DIR_COMPARE_VERSION_MINOR 1)
 
 # Compiler flags
-set(CMAKE_CXX_FLAGS "-std=c++11")
-set(CMAKE_CXX_FLAGS_DEBUG "-gdwarf-2")
+if (${CMAKE_CXX_COMPILER_ID} STREQUAL GNU)
+	set(CMAKE_CXX_FLAGS "-std=c++11")
+	set(CMAKE_CXX_FLAGS_DEBUG "-gdwarf-2")
+elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC)
+	set(CMAKE_CXX_FLAGS "/EHsc /Za")
+	set(CMAKE_CXX_FLAGS_DEBUG "/Od")
+else ()
+	MESSAGE(WARNING "C++ Compiler ${CMAKE_CXX_COMPILER_ID} is not supported, compiler flags are not set")
+endif ()
+
+# Modules path
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 
 # Options
 option(WITH_TESTING "Build tests" OFF)
@@ -45,6 +55,22 @@ configure_file(
 
 include_directories("${PROJECT_BINARY_DIR}")
 
+if (${TARGET_PLATFORM} STREQUAL WIN32)
+	set(PLATFORM_SPECIFIC_SOURCES ${PLATFORM_SPECIFIC_SOURCES}
+	)
+elseif (${TARGET_PLATFORM} STREQUAL LINUX)
+	set(PLATFORM_SPECIFIC_SOURCES ${PLATFORM_SPECIFIC_SOURCES}
+		LinuxFile.cpp
+		LinuxDirectory.cpp
+		LinuxItemFactory.cpp
+		LinuxFileInfo.cpp
+		LinuxFileComparisonStrategy.cpp
+		LinuxDirectoryComparisonStrategy.cpp
+		LinuxSimpleFileComparison.cpp
+		LinuxComparisonFactory.cpp
+	)
+endif ()
+
 add_library(
 	libDirCompare OBJECT
 	ItemFactory.cpp
@@ -54,14 +80,6 @@ add_library(
 	InvalidItem.cpp
 	InvalidFile.cpp
 	InvalidDirectory.cpp
-	LinuxFile.cpp
-	LinuxDirectory.cpp
-	LinuxItemFactory.cpp
-	LinuxFileInfo.cpp
-	LinuxFileComparisonStrategy.cpp
-	LinuxDirectoryComparisonStrategy.cpp
-	LinuxSimpleFileComparison.cpp
-	LinuxComparisonFactory.cpp
 	SimpleDirectoryComparison.cpp
 	ComparisonContext.cpp
 	ComparisonStrategyFactory.cpp
@@ -75,6 +93,7 @@ add_library(
 	ignoring.cpp
 	platform.cpp
 	log.cpp
+	${PLATFORM_SPECIFIC_SOURCES}
 	)
 
 add_executable(dirCompare main.cpp $<TARGET_OBJECTS:libDirCompare>)
@@ -82,7 +101,5 @@ add_executable(dirCompare main.cpp $<TARGET_OBJECTS:libDirCompare>)
 # Testing
 if (${WITH_TESTING})
 	enable_testing()
-	find_library(CPPUNIT "cppunit")
-
 	add_subdirectory("${PROJECT_SOURCE_DIR}/testing")
 endif ()

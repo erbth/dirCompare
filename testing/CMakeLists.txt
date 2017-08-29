@@ -15,13 +15,28 @@
 # limitations under the License.
 #
 
+
+find_package(CppUnit REQUIRED)
+
+if (${TARGET_PLATFORM} STREQUAL WIN32)
+	set(PLATFORM_SPECIFIC_TESTING ${PLATFORM_SPECIFIC_TESTING}
+		win32_testing.cpp
+	)
+elseif (${TARGET_PLATFORM} STREQUAL LINUX)
+	set(PLATFORM_SPECIFIC_TESTING ${PLATFORM_SPECIFIC_TESTING}
+		linux_testing.cpp
+	)
+endif ()
+
 add_executable(
 	testing
 	testing.cpp
+	${PLATFORM_SPECIFIC_TESTING}
 	$<TARGET_OBJECTS:libDirCompare>
 	)
 
 include_directories(testing "${PROJECT_SOURCE_DIR}")
-target_link_libraries(testing "${CPPUNIT}")
+include_directories(testing "${CPPUNIT_INCLUDE_DIR}")
+target_link_libraries(testing "${CPPUNIT_LIBRARY}")
 
 add_test("CPPUNIT" "${PROJECT_BINARY_DIR}/testing/testing")

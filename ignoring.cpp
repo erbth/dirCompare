@@ -71,7 +71,7 @@ static bool match(const string& cpptext, const string& cpppattern)
 		return false;
 	}
 
-	int starPositions[cStars];
+	int* starPositions = new int[cStars];
 	int j = 0;
 
 	for (int i = 0; i < m && j < cStars; i++)
@@ -94,6 +94,7 @@ static bool match(const string& cpptext, const string& cpppattern)
 		{
 			if (pattern[i] != text[i])
 			{
+				delete[] starPositions;
 				return false;
 			}
 		}
@@ -113,6 +114,7 @@ static bool match(const string& cpptext, const string& cpppattern)
 		{
 			if (pattern[m - i + j] != text[n - i])
 			{
+				delete[] starPositions;
 				return false;
 			}
 		}
@@ -134,6 +136,7 @@ static bool match(const string& cpptext, const string& cpppattern)
 
 		if (i < 0)
 		{
+			delete[] starPositions;
 			return false;
 		}
 
@@ -141,13 +144,14 @@ static bool match(const string& cpptext, const string& cpppattern)
 		n -= i + subPatternLength;
 	}
 
+	delete[] starPositions;
 	return true;
 }
 
 #ifdef WITH_TESTING
 bool ignoring_match_test(const string& cpptext, const string& cpppattern)
 {
-	match(cpptext, cpppattern);
+	return match(cpptext, cpppattern);
 }
 #endif
 
@@ -157,13 +161,14 @@ bool ignoring_match_test(const string& cpptext, const string& cpppattern)
  * the epsilon pattern matching. */
 static int KMP(const char* t, int n, const char* s, int m)
 {
-	int border[m + 1];
+	int* border = new int[m + 1];
 	computeBorders(border, m, s);
 	int i = 0;
 	int j = 0;
 
 	if (m == 0)
 	{
+		delete[] border;
 		return 0;
 	}
 
@@ -174,6 +179,7 @@ static int KMP(const char* t, int n, const char* s, int m)
 			j++;
 			if (j == m)
 			{
+				delete[] border;
 				return i;
 			}
 		}
@@ -182,6 +188,7 @@ static int KMP(const char* t, int n, const char* s, int m)
 		j = border[j] > 0 ? border[j] : 0;
 	}
 
+	delete[] border;
 	return -1;
 }
 

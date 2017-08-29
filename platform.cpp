@@ -25,12 +25,16 @@
 #if TARGET_PLATFORM == LINUX
 #include "LinuxItemFactory.h"
 #include "LinuxComparisonFactory.h"
+#elif TARGET_PLATFORM == WIN32
+#pragma message (": warning: not implemented yet")
 #endif
 
 shared_ptr<ItemFactory> createItemFactory(shared_ptr<SystemParameters> sp)
 {
 #if TARGET_PLATFORM == LINUX
 	return make_shared<LinuxItemFactory>(sp);
+#elif TARGET_PLATFORM == WIN32
+	return nullptr;
 #endif
 }
 
@@ -39,5 +43,7 @@ shared_ptr<ComparisonStrategyFactory> createComparisonStrategyFactory(
 {
 #if TARGET_PLATFORM == LINUX
 	return make_shared<LinuxComparisonFactory>(sp);
+#elif TARGET_PLATFORM == WIN32
+	return nullptr;
 #endif
 }
