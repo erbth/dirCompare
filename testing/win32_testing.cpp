@@ -33,8 +33,5 @@
 #include "Directory.h"
 #include "InvalidFile.h"
 #include "InvalidDirectory.h"
-#include "LinuxFile.h"
-#include "LinuxDirectory.h"
-#include "LinuxComparisonFactory.h"
 #include "ComparisonContext.h"
 #include "ignoring_testing.h"

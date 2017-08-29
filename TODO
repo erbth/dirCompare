@@ -1,2 +1,4 @@
 	- cmake: system testing
+	- Linux: testing still working?
+	- leack checking
 	- implement Windows classes / wstring, umlauts!

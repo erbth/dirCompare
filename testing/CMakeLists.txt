@@ -18,7 +18,7 @@
 
 find_package(CppUnit REQUIRED)
 
-if (${TARGET_PLATFORM} STREQUAL WIN32)
+if (${TARGET_PLATFORM} STREQUAL WINDOWS_WIN32)
 	set(PLATFORM_SPECIFIC_TESTING ${PLATFORM_SPECIFIC_TESTING}
 		win32_testing.cpp
 	)
@@ -31,6 +31,9 @@ endif ()
 add_executable(
 	testing
 	testing.cpp
+	StubFile.cpp
+	StubDirectory.cpp
+	StubFileComparisonStrategy.cpp
 	${PLATFORM_SPECIFIC_TESTING}
 	$<TARGET_OBJECTS:libDirCompare>
 	)

@@ -31,17 +31,17 @@
 #include "LinuxItemFactory.h"
 #include "File.h"
 #include "Directory.h"
+#include "StubDirectory.h"
 #include "InvalidFile.h"
 #include "InvalidDirectory.h"
 #include "ComparisonContext.h"
+#include "SimpleDirectoryComparison.h"
+#include "StubFileComparisonStrategy.h"
 #include "ignoring_testing.h"
 
 using namespace CPPUNIT_NS;
 using namespace std;
 
-/* This test suite must be performed after testing Simple Linux File
- * Comparison Strategy, because it depends on it to avoid writing a 
- * stub strategy. */
 class SimpleDirectoryComparisonTest : public TestFixture
 {
 	CPPUNIT_TEST_SUITE(SimpleDirectoryComparisonTest);
@@ -54,8 +54,7 @@ class SimpleDirectoryComparisonTest : public TestFixture
 
 	shared_ptr<stringstream> log;
 	shared_ptr<SystemParameters> sp;
-	shared_ptr<ComparisonStrategyFactory> csf;
-	shared_ptr<FileComparisonStrategy> fileSimple;
+	shared_ptr<FileComparisonStrategy> fileStub;
 	shared_ptr<DirectoryComparisonStrategy> dirSimple;
 	shared_ptr<ComparisonContext> compCtx;
 
@@ -63,12 +62,11 @@ public:
 	void setUp() override
 	{
 		sp = make_shared<SystemParameters>();
-		csf = make_shared<LinuxComparisonFactory>(sp);
-		fileSimple = csf->createFileStrategy("simple");
-		dirSimple = csf->createDirStrategy("simple");
+		fileStub = make_shared<StubFileComparisonStrategy>(sp);
+		dirSimple = make_shared<SimpleDirectoryComparison>(sp);
 		compCtx = make_shared<ComparisonContext>(sp);
 
-		compCtx->setFileComparisonStrategy(fileSimple);
+		compCtx->setFileComparisonStrategy(fileStub);
 		compCtx->setDirectoryComparisonStrategy(dirSimple);
 
 		log = make_shared<stringstream>();
@@ -78,7 +76,7 @@ public:
 	void both_valid()
 	{
 		log->str(string());
-		auto d = make_shared<LinuxDirectory>(".", sp);
+		auto d = make_shared<StubDirectory>("stub", sp);
 
 		CPPUNIT_ASSERT(dirSimple->compare(d, d) == true);
 		CPPUNIT_ASSERT(log->str() == string());
@@ -89,7 +87,7 @@ public:
 		log->str(string());
 		
 		auto d1 = make_shared<InvalidDirectory>("test", sp);
-		auto d2 = make_shared<LinuxDirectory>(".", sp);
+		auto d2 = make_shared<StubDirectory>("stub", sp);
 
 		d1->setErrorMessage("test message");
 
@@ -243,7 +241,7 @@ public:
 
 		double elapsed_seconds = double(end - begin) / CLOCKS_PER_SEC;
 
-		if (elapsed_seconds > 1.0)
+		if (elapsed_seconds > 10.0)
 		{
 			CPPUNIT_FAIL("performance test took too long");
 		}
@@ -322,7 +320,7 @@ public:
 
 		double elapsed_seconds = double(end - begin) / CLOCKS_PER_SEC;
 
-		if (elapsed_seconds > 5.0)
+		if (elapsed_seconds > 20.0)
 		{
 			CPPUNIT_FAIL("performance test took too long");
 		}

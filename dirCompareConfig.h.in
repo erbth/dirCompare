@@ -7,7 +7,7 @@
 
 /* Symbolic constants for target platforms */
 #define LINUX 1
-#define WIN32 2
+#define WINDOWS_WIN32 2
 
 /* Target platform */
 #define TARGET_PLATFORM @TARGET_PLATFORM@
