@@ -38,6 +38,11 @@
 #include "SimpleDirectoryComparison.h"
 #include "StubFileComparisonStrategy.h"
 #include "ignoring_testing.h"
+#include "platform.h"
+
+#if TARGET_PLATFORM == WINDOWS_WIN32
+#include "win32_testing.h"
+#endif
 
 using namespace CPPUNIT_NS;
 using namespace std;
@@ -332,8 +337,12 @@ public:
 	}
 };
 
-CPPUNIT_TEST_SUITE_REGISTRATION(IgnoringTest);
-CPPUNIT_TEST_SUITE_REGISTRATION(SimpleDirectoryComparisonTest);
+// CPPUNIT_TEST_SUITE_REGISTRATION(IgnoringTest);
+// CPPUNIT_TEST_SUITE_REGISTRATION(SimpleDirectoryComparisonTest);
+
+#if TARGET_PLATFORM == WINDOWS_WIN32
+CPPUNIT_TEST_SUITE_REGISTRATION(Win32FileTest);
+#endif
 
 int main(int argc, char** argv)
 {

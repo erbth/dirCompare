@@ -27,7 +27,7 @@ if (${CMAKE_CXX_COMPILER_ID} STREQUAL GNU)
 	set(CMAKE_CXX_FLAGS "-std=c++11")
 	set(CMAKE_CXX_FLAGS_DEBUG "-gdwarf-2")
 elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC)
-	set(CMAKE_CXX_FLAGS "/EHsc /Za")
+	set(CMAKE_CXX_FLAGS "/EHsc")
 	set(CMAKE_CXX_FLAGS_DEBUG "/Od")
 else ()
 	MESSAGE(WARNING "C++ Compiler ${CMAKE_CXX_COMPILER_ID} is not supported, compiler flags are not set")
@@ -57,6 +57,8 @@ include_directories("${PROJECT_BINARY_DIR}")
 
 if (${TARGET_PLATFORM} STREQUAL WINDOWS_WIN32)
 	set(PLATFORM_SPECIFIC_SOURCES ${PLATFORM_SPECIFIC_SOURCES}
+		Win32File.cpp
+		win32_charset_conversion.cpp
 	)
 elseif (${TARGET_PLATFORM} STREQUAL LINUX)
 	set(PLATFORM_SPECIFIC_SOURCES ${PLATFORM_SPECIFIC_SOURCES}
@@ -97,6 +99,7 @@ add_library(
 	)
 
 add_executable(dirCompare main.cpp $<TARGET_OBJECTS:libDirCompare>)
+add_executable(Win32Test Win32Test.cpp $<TARGET_OBJECTS:libDirCompare>)
 
 # Testing
 if (${WITH_TESTING})
