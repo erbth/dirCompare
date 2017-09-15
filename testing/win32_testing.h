@@ -7,24 +7,34 @@
 #include <memory>
 #include <string>
 
-// IMPORTANT: DO ALWAYS CHANGE BOTH! - Ugly, I know.
-#define TEMP_TEST_DIR "tmp_test_dir"
-#define LTEMP_TEST_DIR L"tmp_test_dir"
+#define TEMP_TEST_DIR L"tmp_test_dir"
 
 class Win32FileTest : public CPPUNIT_NS::TestFixture
 {
 	CPPUNIT_TEST_SUITE(Win32FileTest);
 
-	CPPUNIT_TEST(openValidFile);
+	CPPUNIT_TEST(openValidFileRoot);
+	CPPUNIT_TEST(openValidFileSubdir);
 	CPPUNIT_TEST(fileNotFound);
+	CPPUNIT_TEST(openDirectoryMustFail);
+	CPPUNIT_TEST(fileProperties);
 
 	CPPUNIT_TEST_SUITE_END();
 
-public:
-	Win32FileTest();
+private:
+	std::wstring testBase;
+	std::wstring tree90;
+	std::wstring testDir;
+	std::wstring tree98;
 
-	void openValidFile();
+public:
+	void setUp();
+
+	void openValidFileRoot();
+	void openValidFileSubdir();
 	void fileNotFound();
+	void openDirectoryMustFail();
+	void fileProperties();
 };
 
 #endif /* _WIN32_TESTING_H */

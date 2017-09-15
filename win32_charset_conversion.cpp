@@ -17,7 +17,7 @@ string wstring_to_string(const wstring& wstr)
 
 	if (utf8_size == 0)
 	{
-		throw win32_error_exception(GetLastError(), L"Converting to unicode failed: ");
+		throw win32_error_exception(GetLastError(), L"Converting to unicode string failed: ");
 	}
 
 	LPSTR c = new char[utf8_size];
@@ -27,11 +27,38 @@ string wstring_to_string(const wstring& wstr)
 		c, utf8_size, nullptr, nullptr) != utf8_size)
 	{
 		delete[] c;
-		throw win32_error_exception(GetLastError(), L"Converting to unicode failed: ");
+		throw win32_error_exception(GetLastError(), L"Converting to unicode string failed: ");
 	}
 
 	string str(c, utf8_size);
 	delete[] c;
 
 	return str;
+}
+
+wstring string_to_wstring(const string& str)
+{
+	int wide_size = MultiByteToWideChar(
+		CP_UTF8, 0, str.c_str(), str.length(),
+		nullptr, 0);
+
+	if (wide_size == 0)
+	{
+		throw win32_error_exception(GetLastError(), L"Converting to wstring failed: ");
+	}
+
+	LPWSTR w = new wchar_t[wide_size];
+
+	if (MultiByteToWideChar(
+		CP_UTF8, 0, str.c_str(), str.length(),
+		w, wide_size) != wide_size)
+	{
+		delete[] w;
+		throw win32_error_exception(GetLastError(), L"Converting to wstring failed: ");
+	}
+
+	wstring wstr(w, wide_size);
+	delete[] w;
+
+	return wstr;
 }

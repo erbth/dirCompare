@@ -39,8 +39,24 @@ private:
 	void init();
 	
 protected:
-	HANDLE handle;
+	HANDLE handle = INVALID_HANDLE_VALUE;
 	std::wstring wpath;
+
+	DWORD fileType = FILE_TYPE_UNKNOWN;
+	uint64_t size;
+	bool sizeValid = false;
+
+	FILE_BASIC_INFO fbi;
+	bool fbiValid = false;
+	void getFileBasicInfo();
+
+	PSECURITY_DESCRIPTOR pSecurityDescriptor;
+	PSID pSidOwner;
+	PSID pSidGroup;
+	PACL pDacl;
+	PACL pSacl;
+	bool securityInfoValid = false;
+	void getSecurityInfo();
 
 public:
 	Win32File(const std::wstring& path, std::shared_ptr<SystemParameters> sp);
@@ -52,6 +68,18 @@ public:
 	virtual ~Win32File();
 
 	HANDLE getHandle() const;
+
+	DWORD getType();
+	uint64_t getSize();
+	LARGE_INTEGER getCreationTime();
+	LARGE_INTEGER getLastAccessTime();
+	LARGE_INTEGER getLastWriteTime();
+	LARGE_INTEGER getChangeTime();
+	DWORD getAttributes();
+	const PSID getOwner();
+	const PSID getGroup();
+	const PACL getDacl();
+	const PACL getSacl();
 
 	virtual std::ostream& dump(std::ostream& o) const
 	{

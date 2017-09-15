@@ -17,10 +17,12 @@
 
 #include <memory>
 #include <string>
+#include <cstring>
 #include "SystemParameters.h"
 #include "Win32File.h"
 #include "Item.h"
 #include "File.h"
+#include "gp_exception.h"
 #include "Directory.h"
 #include "win32_error_exception.h"
 #include "win32_charset_conversion.h"
@@ -30,12 +32,14 @@
 extern "C"
 {
 	#include <Windows.h>
+	#include <AclAPI.h>
+	#include <AccCtrl.h>
 }
 
 using namespace std;
 
 Win32File::Win32File(const wstring& wpath, shared_ptr<SystemParameters> sp)
-	: File(string(), sp), handle(INVALID_HANDLE_VALUE), wpath(wpath)
+	: File(string(), sp), wpath(wpath)
 {
 	init();
 }
@@ -44,7 +48,7 @@ Win32File::Win32File(
 	const wstring& wpath,
 	shared_ptr<SystemParameters> sp,
 	shared_ptr<const Directory> dir)
-	: File(string(), sp, dir), handle(INVALID_HANDLE_VALUE), wpath(wpath)
+	: File(string(), sp, dir), wpath(wpath)
 {
 	init();
 }
@@ -53,7 +57,8 @@ void Win32File::init()
 {
 	if (directory)
 	{
-		path += "\\" + directory->getPath();
+		wpath = string_to_wstring(directory->getPath()) + L"\\" + wpath;
+		path = wstring_to_string(wpath);
 	}
 	else
 	{
@@ -89,6 +94,21 @@ void Win32File::init()
 	{
 		throw win32_error_exception(GetLastError());
 	}
+
+	if (getAttributes() & FILE_ATTRIBUTE_DIRECTORY)
+	{
+		if (!CloseHandle(handle))
+		{
+			throw win32_error_exception(
+				GetLastError(),
+				L"CloseHandle failed, "
+				L"closing because file is a directory: ");
+		}
+
+		handle = INVALID_HANDLE_VALUE;
+
+		throw gp_exception("is a directory");
+	}
 }
 
 Win32File::~Win32File()
@@ -100,9 +120,140 @@ Win32File::~Win32File()
 			*(sp->getLog()) << endl << "CRITICAL but can't terminate: ~WindowsFile: CloseHandle failed" << endl;
 		}
 	}
+
+	if (securityInfoValid)
+	{
+		LocalFree(pSecurityDescriptor);
+	}
 }
 
 HANDLE Win32File::getHandle() const
 {
 	return handle;
+}
+
+DWORD Win32File::getType()
+{
+	if (fileType == FILE_TYPE_UNKNOWN)
+	{
+		fileType = GetFileType(handle);
+
+		if (fileType == FILE_TYPE_UNKNOWN)
+		{
+			auto err = GetLastError();
+
+			if (err != NO_ERROR)
+			{
+				throw win32_error_exception(err, L"Retrieving type: ");
+			}
+		}
+	}
+
+	return fileType;
+}
+
+uint64_t Win32File::getSize()
+{
+	if (!sizeValid)
+	{
+		DWORD hSize;
+		DWORD lSize = GetFileSize(handle, &hSize);
+
+		if (lSize == INVALID_FILE_SIZE)
+		{
+			auto err = GetLastError();
+
+			if (err != NO_ERROR)
+			{
+				throw win32_error_exception(err, L"Retrieving size: ");
+			}
+		}
+
+		size = ((uint64_t)lSize) | (((uint64_t)hSize) << 32) & 0xffffffff00000000;
+		sizeValid = true;
+	}
+	return size;
+}
+
+void Win32File::getFileBasicInfo()
+{
+	if (!fbiValid)
+	{
+		memset(&fbi, 0, sizeof fbi);
+
+		if (!GetFileInformationByHandleEx(handle, FileBasicInfo, &fbi, sizeof fbi))
+		{
+			throw win32_error_exception(GetLastError(), L"Retrieving timestamps: ");
+		}
+	}
+}
+
+LARGE_INTEGER Win32File::getCreationTime()
+{
+	getFileBasicInfo();
+	return fbi.CreationTime;
+}
+
+LARGE_INTEGER Win32File::getLastAccessTime()
+{
+	getFileBasicInfo();
+	return fbi.LastAccessTime;
+}
+
+LARGE_INTEGER Win32File::getLastWriteTime()
+{
+	getFileBasicInfo();
+	return fbi.LastWriteTime;
+}
+
+LARGE_INTEGER Win32File::getChangeTime()
+{
+	getFileBasicInfo();
+	return fbi.ChangeTime;
+}
+
+DWORD Win32File::getAttributes()
+{
+	getFileBasicInfo();
+	return fbi.FileAttributes;
+}
+
+void Win32File::getSecurityInfo()
+{
+	if (!securityInfoValid)
+	{
+		auto ret = GetSecurityInfo(
+			handle,
+			SE_FILE_OBJECT,
+			BACKUP_SECURITY_INFORMATION,
+			&pSidOwner,
+			&pSidGroup,
+			&pDacl,
+			&pSacl,
+			&pSecurityDescriptor);
+	}
+}
+
+const PSID Win32File::getOwner()
+{
+	getSecurityInfo();
+	return pSidOwner;
+}
+
+const PSID Win32File::getGroup()
+{
+	getSecurityInfo();
+	return pSidGroup;
+}
+
+const PACL Win32File::getDacl()
+{
+	getSecurityInfo();
+	return pDacl;
+}
+
+const PACL Win32File::getSacl()
+{
+	getSecurityInfo();
+	return pSacl;
 }
