@@ -227,14 +227,14 @@ void Win32File::getSecurityInfo()
 			SE_FILE_OBJECT,
 			OWNER_SECURITY_INFORMATION |
 			GROUP_SECURITY_INFORMATION |
-			DACL_SECURITY_INFORMATION |
-			PROTECTED_DACL_SECURITY_INFORMATION |
-			UNPROTECTED_DACL_SECURITY_INFORMATION,
+			DACL_SECURITY_INFORMATION,
 			&pSidOwner,
 			&pSidGroup,
 			&pDacl,
 			&pSacl,
 			&pSecurityDescriptor);
+
+		pSacl = nullptr;
 
 		if (ret != ERROR_SUCCESS)
 		{

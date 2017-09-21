@@ -26,7 +26,8 @@
 
 extern "C"
 {
-	#include <Windows.h>
+#include <Windows.h>
+#include <AccCtrl.h>
 }
 
 #define TEMP_TEST_DIR L"tmp_test_dir"
@@ -48,6 +49,13 @@ private:
 	std::wstring tree90;
 	std::wstring testDir;
 	std::wstring tree98;
+
+	static void printAE(EXPLICIT_ACCESS_W & e);
+	static std::string accessMaskToString(DWORD m);
+	static std::string accessModeToString(ACCESS_MODE m);
+	static std::string inheritanceToString(DWORD i);
+	static std::string sidToString(PSID pSid);
+	static std::string trusteeToString(TRUSTEE_W & t);
 
 public:
 	void setUp();
