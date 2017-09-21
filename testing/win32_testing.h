@@ -7,6 +7,11 @@
 #include <memory>
 #include <string>
 
+extern "C"
+{
+	#include <Windows.h>
+}
+
 #define TEMP_TEST_DIR L"tmp_test_dir"
 
 class Win32FileTest : public CPPUNIT_NS::TestFixture
@@ -27,6 +32,8 @@ private:
 	std::wstring testDir;
 	std::wstring tree98;
 
+	static void printSid(const PSID sid, const std::string text);
+
 public:
 	void setUp();
 
@@ -36,5 +43,8 @@ public:
 	void openDirectoryMustFail();
 	void fileProperties();
 };
+
+void setSETakeOwnershipName();
+void clearSETakeOwnershipName();
 
 #endif /* _WIN32_TESTING_H */

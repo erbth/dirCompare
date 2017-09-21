@@ -11,54 +11,68 @@ using namespace std;
 
 string wstring_to_string(const wstring& wstr)
 {
-	int utf8_size = WideCharToMultiByte(
-		CP_UTF8, 0, wstr.c_str(), wstr.length(),
-		nullptr, 0, nullptr, nullptr);
-
-	if (utf8_size == 0)
+	if (wstr.length() > 0)
 	{
-		throw win32_error_exception(GetLastError(), L"Converting to unicode string failed: ");
-	}
+		int utf8_size = WideCharToMultiByte(
+			CP_UTF8, 0, wstr.c_str(), wstr.length(),
+			nullptr, 0, nullptr, nullptr);
 
-	LPSTR c = new char[utf8_size];
+		if (utf8_size == 0)
+		{
+			throw win32_error_exception(GetLastError(), L"Converting to unicode string failed: ");
+		}
 
-	if (WideCharToMultiByte(
-		CP_UTF8, 0, wstr.c_str(), wstr.length(),
-		c, utf8_size, nullptr, nullptr) != utf8_size)
-	{
+		LPSTR c = new char[utf8_size];
+
+		if (WideCharToMultiByte(
+			CP_UTF8, 0, wstr.c_str(), wstr.length(),
+			c, utf8_size, nullptr, nullptr) != utf8_size)
+		{
+			delete[] c;
+			throw win32_error_exception(GetLastError(), L"Converting to unicode string failed: ");
+		}
+
+		string str(c, utf8_size);
 		delete[] c;
-		throw win32_error_exception(GetLastError(), L"Converting to unicode string failed: ");
+
+		return str;
 	}
-
-	string str(c, utf8_size);
-	delete[] c;
-
-	return str;
+	else
+	{
+		return string();
+	}
 }
 
 wstring string_to_wstring(const string& str)
 {
-	int wide_size = MultiByteToWideChar(
-		CP_UTF8, 0, str.c_str(), str.length(),
-		nullptr, 0);
-
-	if (wide_size == 0)
+	if (str.length() > 0)
 	{
-		throw win32_error_exception(GetLastError(), L"Converting to wstring failed: ");
-	}
+		int wide_size = MultiByteToWideChar(
+			CP_UTF8, 0, str.c_str(), str.length(),
+			nullptr, 0);
 
-	LPWSTR w = new wchar_t[wide_size];
+		if (wide_size == 0)
+		{
+			throw win32_error_exception(GetLastError(), L"Converting to wstring failed: ");
+		}
 
-	if (MultiByteToWideChar(
-		CP_UTF8, 0, str.c_str(), str.length(),
-		w, wide_size) != wide_size)
-	{
+		LPWSTR w = new wchar_t[wide_size];
+
+		if (MultiByteToWideChar(
+			CP_UTF8, 0, str.c_str(), str.length(),
+			w, wide_size) != wide_size)
+		{
+			delete[] w;
+			throw win32_error_exception(GetLastError(), L"Converting to wstring failed: ");
+		}
+
+		wstring wstr(w, wide_size);
 		delete[] w;
-		throw win32_error_exception(GetLastError(), L"Converting to wstring failed: ");
+
+		return wstr;
 	}
-
-	wstring wstr(w, wide_size);
-	delete[] w;
-
-	return wstr;
+	else
+	{
+		return wstring();
+	}
 }

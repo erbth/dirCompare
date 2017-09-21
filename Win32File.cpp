@@ -225,12 +225,23 @@ void Win32File::getSecurityInfo()
 		auto ret = GetSecurityInfo(
 			handle,
 			SE_FILE_OBJECT,
-			BACKUP_SECURITY_INFORMATION,
+			OWNER_SECURITY_INFORMATION |
+			GROUP_SECURITY_INFORMATION |
+			DACL_SECURITY_INFORMATION |
+			PROTECTED_DACL_SECURITY_INFORMATION |
+			UNPROTECTED_DACL_SECURITY_INFORMATION,
 			&pSidOwner,
 			&pSidGroup,
 			&pDacl,
 			&pSacl,
 			&pSecurityDescriptor);
+
+		if (ret != ERROR_SUCCESS)
+		{
+			throw win32_error_exception(ret, L"GetSecurityInfo failed: ");
+		}
+
+		securityInfoValid = true;
 	}
 }
 

@@ -15,6 +15,13 @@
 * limitations under the License.
 */
 
+#ifndef UNICODE
+#define UNICODE
+#endif
+#ifndef _UNICODE
+#define _UNICODE
+#endif
+
 #include <memory>
 #include <string>
 #include <fstream>
@@ -22,6 +29,7 @@
 #include "win32_testing.h"
 #include "Win32File.h"
 #include "win32_error_exception.h"
+#include "gp_exception.h"
 #include "win32_charset_conversion.h"
 #include "win32_date.h"
 #include "StubDirectory.h"
@@ -29,6 +37,9 @@
 extern "C"
 {
 	#include <Windows.h>
+	#include <Sddl.h>
+	#include <Aclapi.h>
+	#include <AccCtrl.h>
 }
 
 using namespace std;
@@ -83,17 +94,10 @@ void Win32FileTest::setUp()
 
 		f.close();
 
-		FILE_BASIC_INFO fbi = { 0 };
-
-		fbi.CreationTime.QuadPart = 10000000LL;
-		fbi.LastAccessTime.QuadPart = 100000000LL;
-		fbi.LastWriteTime.QuadPart = 1000000000LL;
-		fbi.ChangeTime.QuadPart = 10000000000LL;
-		fbi.FileAttributes = FILE_ATTRIBUTE_HIDDEN;
-
+		// Adjust file properties
 		auto hFile = CreateFileW(
 			tree90.c_str(),
-			FILE_WRITE_ATTRIBUTES,
+			FILE_WRITE_ATTRIBUTES | WRITE_OWNER,
 			0,
 			nullptr,
 			OPEN_EXISTING,
@@ -106,6 +110,89 @@ void Win32FileTest::setUp()
 				L"Unable to open " + tree90 +
 				L" for editing attributes and timestamps: ");
 		}
+
+		// Scurity info
+		PSID pSidAdmin;
+		PSID pSidWorld;
+		SID_IDENTIFIER_AUTHORITY siaAdmin = SECURITY_NT_AUTHORITY;
+		SID_IDENTIFIER_AUTHORITY siaWorld = SECURITY_WORLD_SID_AUTHORITY;
+
+		if (!AllocateAndInitializeSid(
+			&siaAdmin,
+			2,
+			SECURITY_BUILTIN_DOMAIN_RID,
+			DOMAIN_ALIAS_RID_ADMINS,
+			0, 0, 0, 0, 0, 0,
+			&pSidAdmin))
+		{
+			throw win32_error_exception(GetLastError(),
+				L"AllocateAndInitializeSid (BUILTIN\admin) failed: ");
+		}
+
+		if (!AllocateAndInitializeSid(
+			&siaWorld,
+			1,
+			SECURITY_WORLD_RID,
+			0, 0, 0, 0, 0, 0, 0,
+			&pSidWorld))
+		{
+			FreeSid(pSidAdmin);
+			throw win32_error_exception(GetLastError(),
+				L"AllocateAndinitializeSid (world) failed: ");
+		}
+
+		try
+		{
+			setSETakeOwnershipName();
+		}
+		catch (...)
+		{
+			FreeSid(pSidWorld);
+			FreeSid(pSidAdmin);
+			CloseHandle(hFile);
+			throw;
+		}
+
+		DWORD ret = SetSecurityInfo(
+			hFile,
+			SE_FILE_OBJECT,
+			OWNER_SECURITY_INFORMATION |
+			GROUP_SECURITY_INFORMATION,
+			pSidAdmin,
+			pSidWorld,
+			nullptr,
+			nullptr);
+
+		FreeSid(pSidWorld);
+		FreeSid(pSidAdmin);
+
+		try
+		{
+			clearSETakeOwnershipName();
+		}
+		catch (...)
+		{
+			CloseHandle(hFile);
+			throw;
+		}
+
+		if (ret != ERROR_SUCCESS)
+		{
+			CloseHandle(hFile);
+
+			cout << endl << "Error: " << to_string(ret) << endl;
+
+			throw win32_error_exception(ret, L"SetSecurityInfo failed: ");
+		}
+
+		// Timestamps, attributes
+		FILE_BASIC_INFO fbi = { 0 };
+
+		fbi.CreationTime.QuadPart = 10000000LL;
+		fbi.LastAccessTime.QuadPart = 100000000LL;
+		fbi.LastWriteTime.QuadPart = 1000000000LL;
+		fbi.ChangeTime.QuadPart = 10000000000LL;
+		fbi.FileAttributes = FILE_ATTRIBUTE_HIDDEN;
 
 		if (!SetFileInformationByHandle(hFile, FileBasicInfo, &fbi, sizeof fbi))
 		{
@@ -277,4 +364,180 @@ void Win32FileTest::fileProperties()
 
 	// Attributes
 	CPPUNIT_ASSERT(wf->getAttributes() == FILE_ATTRIBUTE_HIDDEN);
+
+	// Owner
+	PSID owner = wf->getOwner();
+
+	PSID pSidAdmin;
+	SID_IDENTIFIER_AUTHORITY siaAdmin = SECURITY_NT_AUTHORITY;
+
+	if (!AllocateAndInitializeSid(
+		&siaAdmin,
+		2,
+		SECURITY_BUILTIN_DOMAIN_RID,
+		DOMAIN_ALIAS_RID_ADMINS,
+		0, 0, 0, 0, 0, 0,
+		&pSidAdmin))
+	{
+		throw win32_error_exception(GetLastError(),
+			L"AllocateAndInitializeSid (BUILTIN\admin) failed: ");
+	}
+
+	auto isEqual = EqualSid(owner, pSidAdmin);
+	FreeSid(pSidAdmin);
+
+	CPPUNIT_ASSERT(isEqual);
+
+	// Primary group
+	PSID group = wf->getGroup();
+
+	PSID pSidWorld;
+	SID_IDENTIFIER_AUTHORITY siaWorld = SECURITY_WORLD_SID_AUTHORITY;
+	
+	if (!AllocateAndInitializeSid(
+		&siaWorld,
+		1,
+		SECURITY_WORLD_RID,
+		0, 0, 0, 0, 0, 0, 0,
+		&pSidWorld))
+	{
+		throw win32_error_exception(GetLastError(),
+			L"AllocateAndinitializeSid (world) failed: ");
+	}
+
+	isEqual = EqualSid(group, pSidWorld);
+	FreeSid(pSidWorld);
+
+	CPPUNIT_ASSERT(isEqual);
+}
+
+void Win32FileTest::printSid(const PSID sid, const string text)
+{
+	LPWSTR name;
+	LPWSTR domainName;
+	DWORD cchName = 0;
+	DWORD cchDomainName = 0;
+	SID_NAME_USE use;
+
+	if (!LookupAccountSidW(
+		nullptr,
+		sid,
+		nullptr,
+		&cchName,
+		nullptr,
+		&cchDomainName,
+		&use))
+	{
+		// 122: insufficient buffer size - ok, because that's what we're doing
+		if (GetLastError() != 122)
+		{
+			throw win32_error_exception(GetLastError(), L"string length determining LookupAccountSid failed: ");
+		}
+	}
+
+	name = new wchar_t[cchName];
+	domainName = new wchar_t[cchDomainName];
+
+	if (!LookupAccountSidW(
+		nullptr,
+		sid,
+		name,
+		&cchName,
+		domainName,
+		&cchDomainName,
+		&use))
+	{
+		auto err = GetLastError();
+		delete[] name;
+		delete[] domainName;
+		throw win32_error_exception(err, L"LookupAccountSid with buffers failed: ");
+	}
+
+	cout << endl << text << wstring_to_string(wstring(name)) << "@" <<
+		wstring_to_string(wstring(domainName)) << endl;
+
+	delete[] name;
+	delete[] domainName;
+}
+
+// see https://msdn.microsoft.com/en-us/library/windows/desktop/aa446619(v=vs.85).aspx
+static void setPrivilege(
+	HANDLE hToken,
+	LPCWSTR lpszPrivilege,
+	BOOL bEnablePrivilege)
+{
+	TOKEN_PRIVILEGES tp;
+	LUID luid;
+
+	if (!LookupPrivilegeValueW(
+		nullptr,
+		lpszPrivilege,
+		&luid))
+	{
+		throw win32_error_exception(GetLastError(), L"LookupPrivilegeValue failed: ");
+	}
+
+	tp.PrivilegeCount = 1;
+	tp.Privileges[0].Luid = luid;
+
+	if (bEnablePrivilege)
+	{
+		tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+	}
+	else
+	{
+		tp.Privileges[0].Attributes = 0;
+	}
+
+	// Enable the privilege or disable all privileges
+	if (!AdjustTokenPrivileges(
+		hToken,
+		FALSE,
+		&tp,
+		sizeof tp,
+		nullptr,
+		nullptr))
+	{
+		throw win32_error_exception(GetLastError(), L"AdjustTokenPrivileges failed: ");
+	}
+
+	if (GetLastError() == ERROR_NOT_ALL_ASSIGNED)
+	{
+		throw gp_exception("The token does not have the privilege.");
+	}
+}
+
+// see https://msdn.microsoft.com/en-us/library/windows/desktop/aa379620(v=vs.85).aspx
+void setSETakeOwnershipName()
+{
+	HANDLE hToken;
+
+	// Open handle to access token of calling process
+	if (!OpenProcessToken(
+		GetCurrentProcess(),
+		TOKEN_ADJUST_PRIVILEGES,
+		&hToken))
+	{
+		throw win32_error_exception(GetLastError(), L"OpenProcessToken failed: ");
+	}
+
+	// Enable the SE_TAKE_OWNERSHIP_NAME privilege
+	setPrivilege(hToken, SE_TAKE_OWNERSHIP_NAME, TRUE);
+}
+
+void clearSETakeOwnershipName()
+{
+	HANDLE hToken;
+
+	// Open handle to access token of calling process
+	if (!OpenProcessToken(
+		GetCurrentProcess(),
+		TOKEN_ADJUST_PRIVILEGES,
+		&hToken))
+	{
+		throw win32_error_exception(GetLastError(), L"OpenProcessToken failed: ");
+	}
+
+	// Enable the SE_TAKE_OWNERSHIP_NAME privilege
+	setPrivilege(hToken, SE_TAKE_OWNERSHIP_NAME, FALSE);
 }
