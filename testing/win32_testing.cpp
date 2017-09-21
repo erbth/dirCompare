@@ -31,7 +31,6 @@
 #include "win32_error_exception.h"
 #include "gp_exception.h"
 #include "win32_charset_conversion.h"
-#include "win32_date.h"
 #include "StubDirectory.h"
 
 extern "C"
@@ -409,55 +408,6 @@ void Win32FileTest::fileProperties()
 	FreeSid(pSidWorld);
 
 	CPPUNIT_ASSERT(isEqual);
-}
-
-void Win32FileTest::printSid(const PSID sid, const string text)
-{
-	LPWSTR name;
-	LPWSTR domainName;
-	DWORD cchName = 0;
-	DWORD cchDomainName = 0;
-	SID_NAME_USE use;
-
-	if (!LookupAccountSidW(
-		nullptr,
-		sid,
-		nullptr,
-		&cchName,
-		nullptr,
-		&cchDomainName,
-		&use))
-	{
-		// 122: insufficient buffer size - ok, because that's what we're doing
-		if (GetLastError() != 122)
-		{
-			throw win32_error_exception(GetLastError(), L"string length determining LookupAccountSid failed: ");
-		}
-	}
-
-	name = new wchar_t[cchName];
-	domainName = new wchar_t[cchDomainName];
-
-	if (!LookupAccountSidW(
-		nullptr,
-		sid,
-		name,
-		&cchName,
-		domainName,
-		&cchDomainName,
-		&use))
-	{
-		auto err = GetLastError();
-		delete[] name;
-		delete[] domainName;
-		throw win32_error_exception(err, L"LookupAccountSid with buffers failed: ");
-	}
-
-	cout << endl << text << wstring_to_string(wstring(name)) << "@" <<
-		wstring_to_string(wstring(domainName)) << endl;
-
-	delete[] name;
-	delete[] domainName;
 }
 
 // see https://msdn.microsoft.com/en-us/library/windows/desktop/aa446619(v=vs.85).aspx
