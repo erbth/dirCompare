@@ -96,7 +96,11 @@ void Win32FileTest::setUp()
 		// Adjust file properties
 		auto hFile = CreateFileW(
 			tree90.c_str(),
-			FILE_WRITE_ATTRIBUTES | WRITE_OWNER,
+			READ_ATTRIBUTES |
+			READ_CONTROL |
+			FILE_WRITE_ATTRIBUTES |
+			WRITE_OWNER |
+			WRITE_DAC,
 			0,
 			nullptr,
 			OPEN_EXISTING,
@@ -111,6 +115,7 @@ void Win32FileTest::setUp()
 		}
 
 		// Scurity info
+		// Owner and primary group
 		PSID pSidAdmin;
 		PSID pSidWorld;
 		SID_IDENTIFIER_AUTHORITY siaAdmin = SECURITY_NT_AUTHORITY;
@@ -162,26 +167,73 @@ void Win32FileTest::setUp()
 			nullptr,
 			nullptr);
 
-		FreeSid(pSidWorld);
-		FreeSid(pSidAdmin);
-
 		try
 		{
 			clearSETakeOwnershipName();
 		}
 		catch (...)
 		{
+			FreeSid(pSidWorld);
+			FreeSid(pSidAdmin);
 			CloseHandle(hFile);
 			throw;
 		}
 
 		if (ret != ERROR_SUCCESS)
 		{
+			FreeSid(pSidWorld);
+			FreeSid(pSidAdmin);
 			CloseHandle(hFile);
 
-			cout << endl << "Error: " << to_string(ret) << endl;
+			throw win32_error_exception(
+				ret,
+				L"SetSecurityInfo (owner, primary group) failed: ");
+		}
+		
+		// DACL
+		// Adjust file properties
+		PACL pDacl = nullptr;
+		EXPLICIT_ACCESS_W ea;
 
-			throw win32_error_exception(ret, L"SetSecurityInfo failed: ");
+		ZeroMemory(&ea, sizeof ea);
+
+		ea.grfAccessPermissions = GENERIC_READ;
+		ea.grfAccessMode = SET_ACCESS;
+		ea.grfInheritance = NO_INHERITANCE;
+		ea.Trustee.TrusteeForm = TRUSTEE_IS_SID;
+		ea.Trustee.TrusteeType = TRUSTEE_IS_WELL_KNOWN_GROUP;
+		ea.Trustee.ptstrName = (LPWSTR)pSidWorld;
+
+		ret = SetEntriesInAclW(1, &ea, nullptr, &pDacl);
+		if (ret != ERROR_SUCCESS)
+		{
+			FreeSid(pSidWorld);
+			FreeSid(pSidAdmin);
+			CloseHandle(hFile);
+			throw win32_error_exception(ret, L"SetEntriesInAcl failed: ");
+		}
+
+		ret = SetSecurityInfo(
+			hFile,
+			SE_FILE_OBJECT,
+			DACL_SECURITY_INFORMATION |
+			PROTECTED_DACL_SECURITY_INFORMATION,
+			nullptr,
+			nullptr,
+			pDacl,
+			nullptr);
+
+		LocalFree(pDacl);
+		FreeSid(pSidWorld);
+		FreeSid(pSidAdmin);
+
+		if (ret != ERROR_SUCCESS)
+		{
+			CloseHandle(hFile);
+
+			throw win32_error_exception(
+				ret,
+				L"SetSecurityInfo (DACL) failed: ");
 		}
 
 		// Timestamps, attributes
@@ -356,13 +408,13 @@ void Win32FileTest::fileProperties()
 	CPPUNIT_ASSERT(wf->getSize() == 13);
 
 	// Timestamps
-	// CPPUNIT_ASSERT(wf->getCreationTime().QuadPart == 10000000LL);
-	// CPPUNIT_ASSERT(wf->getLastAccessTime().QuadPart == 100000000LL);
-	// CPPUNIT_ASSERT(wf->getLastWriteTime().QuadPart == 1000000000LL);
-	// CPPUNIT_ASSERT(wf->getChangeTime().QuadPart == 10000000000LL);
+	CPPUNIT_ASSERT(wf->getCreationTime().QuadPart == 10000000LL);
+	CPPUNIT_ASSERT(wf->getLastAccessTime().QuadPart == 100000000LL);
+	CPPUNIT_ASSERT(wf->getLastWriteTime().QuadPart == 1000000000LL);
+	CPPUNIT_ASSERT(wf->getChangeTime().QuadPart == 10000000000LL);
 
 	// Attributes
-	// CPPUNIT_ASSERT(wf->getAttributes() == FILE_ATTRIBUTE_HIDDEN);
+	CPPUNIT_ASSERT(wf->getAttributes() == FILE_ATTRIBUTE_HIDDEN);
 
 	// Owner
 	PSID owner = wf->getOwner();
@@ -378,6 +430,7 @@ void Win32FileTest::fileProperties()
 		0, 0, 0, 0, 0, 0,
 		&pSidAdmin))
 	{
+		FreeSid(pSidAdmin);
 		throw win32_error_exception(GetLastError(),
 			L"AllocateAndInitializeSid (BUILTIN\admin) failed: ");
 	}
@@ -400,12 +453,12 @@ void Win32FileTest::fileProperties()
 		0, 0, 0, 0, 0, 0, 0,
 		&pSidWorld))
 	{
+		FreeSid(pSidWorld);
 		throw win32_error_exception(GetLastError(),
 			L"AllocateAndinitializeSid (world) failed: ");
 	}
 
 	isEqual = EqualSid(group, pSidWorld);
-	FreeSid(pSidWorld);
 
 	CPPUNIT_ASSERT(isEqual);
 
@@ -418,28 +471,35 @@ void Win32FileTest::fileProperties()
 	DWORD ret = GetExplicitEntriesFromAclW(pDacl, &cEntries, &pEntries);
 	if (ret != ERROR_SUCCESS)
 	{
+		FreeSid(pSidWorld);
 		throw win32_error_exception(GetLastError(),
 			L"GetExplicitEntriesFromAcl failed: ");
 	}
 
-	cout << endl << to_string(cEntries) << endl;
+	CPPUNIT_ASSERT(cEntries == 1);
 
-	try
-	{
-		for (ULONG i = 0; i < cEntries; i++)
-		{
-			auto e = pEntries[i];
+	// No straight-foreward test for GENERIC_READ
+	CPPUNIT_ASSERT(pEntries[0].grfAccessPermissions == (
+		READ_CONTROL |
+		SYNCHRONIZE |
+		FILE_READ_DATA |
+		FILE_READ_EA |
+		FILE_READ_ATTRIBUTES));
 
-			printAE(e);
-		}
-	}
-	catch (...)
-	{
-		LocalFree(pEntries);
-		throw;
-	}
+	CPPUNIT_ASSERT(pEntries[0].grfAccessMode == GRANT_ACCESS);
+	CPPUNIT_ASSERT(pEntries[0].grfInheritance == NO_INHERITANCE);
+
+	// Trustee not verified, because the DACL as a whole already appears to work.
 
 	LocalFree(pEntries);
+	FreeSid(pSidWorld);
+
+	CPPUNIT_ASSERT(wf->isDaclProtected() == true);
+
+	// Test with an unprotected DACL, too
+	auto wf98 = make_shared<Win32File>(tree98, sp);
+
+	CPPUNIT_ASSERT(wf98->isDaclProtected() == false);
 }
 
 void Win32FileTest::printAE(EXPLICIT_ACCESS_W& e)

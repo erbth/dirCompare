@@ -76,6 +76,10 @@
 	\begin{tabularx}{\linewidth}{lX}
 		simple & Compares only the file parameters retrieved via \texttt{stat} except ctime, the count of allocated blocks and a few others. In case of a difference the reason is listed in the output log. However, not all inequalities are listed but only the first one compared and found unequal. This file comparison strategy performs no filtering, this has to be done by the used directory comparison strategy which is the only part of the system that can query files.
 	\end{tabularx}
+
+	\paragraph{Windows (Win32)} On Windows using Win32 API the following comparison strategies are currently available:
+	
+	It is important to note that System Access-Control Lists (SACLs) are currently not supported.
 	
 	\paragraph{All target platforms} The following directory comparison strategies are currently available on any target platform:
 	

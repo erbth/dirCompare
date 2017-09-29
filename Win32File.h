@@ -54,7 +54,6 @@ protected:
 	PSID pSidOwner;
 	PSID pSidGroup;
 	PACL pDacl;
-	PACL pSacl;
 	bool securityInfoValid = false;
 	void getSecurityInfo();
 
@@ -79,7 +78,7 @@ public:
 	const PSID getOwner();
 	const PSID getGroup();
 	const PACL getDacl();
-	const PACL getSacl();
+	bool isDaclProtected();
 
 	virtual std::ostream& dump(std::ostream& o) const
 	{

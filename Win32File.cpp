@@ -231,10 +231,8 @@ void Win32File::getSecurityInfo()
 			&pSidOwner,
 			&pSidGroup,
 			&pDacl,
-			&pSacl,
+			nullptr,
 			&pSecurityDescriptor);
-
-		pSacl = nullptr;
 
 		if (ret != ERROR_SUCCESS)
 		{
@@ -263,8 +261,19 @@ const PACL Win32File::getDacl()
 	return pDacl;
 }
 
-const PACL Win32File::getSacl()
+bool Win32File::isDaclProtected()
 {
 	getSecurityInfo();
-	return pSacl;
+
+	SECURITY_DESCRIPTOR_CONTROL sdc;
+	DWORD rev;
+
+	if (!GetSecurityDescriptorControl(pSecurityDescriptor, &sdc, &rev))
+	{
+		throw win32_error_exception(
+			GetLastError(),
+			L"GetSecurityDescriptorControl (DACL) failed: ");
+	}
+
+	return sdc & SE_DACL_PROTECTED;
 }
