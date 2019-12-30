@@ -70,10 +70,11 @@ void Win32File::init()
 			throw win32_error_exception(GetLastError());
 		}
 
-		buf = new wchar_t[len];
+		buf = new wchar_t[len + 1];
 		
-		if (GetFullPathNameW(wpath.c_str(), len, buf, nullptr) != len - 1)
+		if (GetFullPathNameW(wpath.c_str(), len + 1, buf, nullptr) == 0)
 		{
+			delete[] buf;
 			throw win32_error_exception(GetLastError());
 		}
 
@@ -117,7 +118,7 @@ Win32File::~Win32File()
 	{
 		if (!CloseHandle(handle))
 		{
-			*(sp->getLog()) << endl << "CRITICAL but can't terminate: ~WindowsFile: CloseHandle failed" << endl;
+			*(sp->getLog()) << endl << "CRITICAL but can't terminate: ~Win32File: CloseHandle failed" << endl;
 		}
 	}
 
@@ -132,7 +133,7 @@ HANDLE Win32File::getHandle() const
 	return handle;
 }
 
-DWORD Win32File::getType()
+DWORD Win32File::getType() const
 {
 	if (fileType == FILE_TYPE_UNKNOWN)
 	{
@@ -152,7 +153,7 @@ DWORD Win32File::getType()
 	return fileType;
 }
 
-uint64_t Win32File::getSize()
+uint64_t Win32File::getSize() const
 {
 	if (!sizeValid)
 	{
@@ -175,7 +176,7 @@ uint64_t Win32File::getSize()
 	return size;
 }
 
-void Win32File::getFileBasicInfo()
+void Win32File::getFileBasicInfo() const
 {
 	if (!fbiValid)
 	{
@@ -188,37 +189,37 @@ void Win32File::getFileBasicInfo()
 	}
 }
 
-LARGE_INTEGER Win32File::getCreationTime()
+LARGE_INTEGER Win32File::getCreationTime() const
 {
 	getFileBasicInfo();
 	return fbi.CreationTime;
 }
 
-LARGE_INTEGER Win32File::getLastAccessTime()
+LARGE_INTEGER Win32File::getLastAccessTime() const
 {
 	getFileBasicInfo();
 	return fbi.LastAccessTime;
 }
 
-LARGE_INTEGER Win32File::getLastWriteTime()
+LARGE_INTEGER Win32File::getLastWriteTime() const
 {
 	getFileBasicInfo();
 	return fbi.LastWriteTime;
 }
 
-LARGE_INTEGER Win32File::getChangeTime()
+LARGE_INTEGER Win32File::getChangeTime() const
 {
 	getFileBasicInfo();
 	return fbi.ChangeTime;
 }
 
-DWORD Win32File::getAttributes()
+DWORD Win32File::getAttributes() const
 {
 	getFileBasicInfo();
 	return fbi.FileAttributes;
 }
 
-void Win32File::getSecurityInfo()
+void Win32File::getSecurityInfo() const
 {
 	if (!securityInfoValid)
 	{
@@ -243,25 +244,25 @@ void Win32File::getSecurityInfo()
 	}
 }
 
-const PSID Win32File::getOwner()
+const PSID Win32File::getOwner() const
 {
 	getSecurityInfo();
 	return pSidOwner;
 }
 
-const PSID Win32File::getGroup()
+const PSID Win32File::getGroup() const
 {
 	getSecurityInfo();
 	return pSidGroup;
 }
 
-const PACL Win32File::getDacl()
+const PACL Win32File::getDacl() const
 {
 	getSecurityInfo();
 	return pDacl;
 }
 
-bool Win32File::isDaclProtected()
+bool Win32File::isDaclProtected() const
 {
 	getSecurityInfo();
 

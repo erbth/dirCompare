@@ -58,7 +58,13 @@ include_directories("${PROJECT_BINARY_DIR}")
 if (${TARGET_PLATFORM} STREQUAL WINDOWS_WIN32)
 	set(PLATFORM_SPECIFIC_SOURCES ${PLATFORM_SPECIFIC_SOURCES}
 		Win32File.cpp
+		Win32Directory.cpp
 		win32_charset_conversion.cpp
+		Win32ItemFactory.cpp
+		Win32Item.cpp
+		win32_security_tools.cpp
+		Win32SimpleFileComparison.cpp
+		Win32ComparisonFactory.cpp
 	)
 elseif (${TARGET_PLATFORM} STREQUAL LINUX)
 	set(PLATFORM_SPECIFIC_SOURCES ${PLATFORM_SPECIFIC_SOURCES}

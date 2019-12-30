@@ -33,7 +33,7 @@ static void printHelp()
 	cout << "This is dirCompare version " << DIR_COMPARE_VERSION_MAJOR
 		<< "." << DIR_COMPARE_VERSION_MINOR << endl << endl;
 
-	cout << "Copyright 2017 Thomas Erbesdobler <t.erbesdobler@team103.com>"
+	cout << "Copyright 2017-2019 Thomas Erbesdobler <t.erbesdobler@team103.com>"
 		<< endl << endl;
 
 	cout << "Licensed under the Apache License, Version 2.0 (the \"License\");"
@@ -54,15 +54,15 @@ static void printHelp()
 	"limitations under the License." << endl << endl;
 
 	cout << "Parameter summary:" << endl;
-	cout << "--help" << endl;
-	cout << "--dir1 <path>" << endl;
-	cout << "--dir2 <path>" << endl;
-	cout << "--listStrategies" << endl;
-	cout << "--fileStrategy <id>" << endl;
-	cout << "--dirStrategy <id>" << endl;
-	cout << "--ignoreFile <name>" << endl;
-	cout << "--ignoreDir <name>" << endl;
-	cout << "--logfile <path>" << endl;
+	cout << "  --help" << endl;
+	cout << "  --dir1 <path>" << endl;
+	cout << "  --dir2 <path>" << endl;
+	cout << "  --listStrategies" << endl;
+	cout << "  --fileStrategy <id>" << endl;
+	cout << "  --dirStrategy <id>" << endl;
+	cout << "  --ignoreFile <name>" << endl;
+	cout << "  --ignoreDir <name>" << endl;
+	cout << "  --logfile <path>" << endl;
 
 	cout << endl << "For further information please consult the "
 		"documentation." << endl;

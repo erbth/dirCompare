@@ -15,27 +15,27 @@
  * limitations under the License.
  */
 
-#ifndef _GP_EXCEPTION_H
-#define _GP_EXCEPTION_H
+#ifndef _WIN32_COMPARISON_FACTORY_H
+#define _WIN32_COMPARISON_FACTORY_H
 
-#include <exception>
+#include <vector>
+#include <memory>
+#include "SystemParameters.h"
+#include "FileComparisonStrategy.h"
+#include "DirectoryComparisonStrategy.h"
+#include "ComparisonStrategyFactory.h"
 
-#include <string>
 
-class gp_exception : public std::exception
+class Win32ComparisonFactory : public ComparisonStrategyFactory
 {
-private:
-	const std::string msg;
-
 public:
-	gp_exception(const std::string& msg) : msg(msg)
-	{
-	}
+	Win32ComparisonFactory(std::shared_ptr<SystemParameters> sp);
 
-	virtual const char* what() const throw() override
-	{
-		return msg.c_str();
-	}
+	virtual std::vector<std::shared_ptr<FileComparisonStrategy>>
+		createFileStrategies() override;
+
+	virtual std::vector<std::shared_ptr<DirectoryComparisonStrategy>>
+		createDirStrategies() override;
 };
 
-#endif /* _GP_EXCEPTION_H */
+#endif /* _WIN32_COMPARISON_FACTORY_H */

@@ -15,37 +15,32 @@
  * limitations under the License.
  */
 
-#ifndef _WIN32_FILE_H
-#define _WIN32_FILE_H
+#ifndef _WIN32_DIRECTORY_H
+#define _WIN32_DIRECTORY_H
 
 #include <iostream>
 #include <memory>
 #include <string>
+#include <vector>
+#include <memory>
 #include "SystemParameters.h"
-#include "Item.h"
-#include "File.h"
 #include "Directory.h"
+#include "Item.h"
 #include "Win32Item.h"
 
 extern "C"
 {
-	#include <Windows.h>
+#include <Windows.h>
 }
 
-class Directory;
-
-class Win32File : public File, public Win32Item
+class Win32Directory : public Directory, public Win32Item
 {
 private:
 	void init();
-	
+
 protected:
 	HANDLE handle = INVALID_HANDLE_VALUE;
 	std::wstring wpath;
-
-	mutable DWORD fileType = FILE_TYPE_UNKNOWN;
-	mutable uint64_t size;
-	mutable bool sizeValid = false;
 
 	mutable FILE_BASIC_INFO fbi;
 	mutable bool fbiValid = false;
@@ -59,13 +54,15 @@ protected:
 	void getSecurityInfo() const;
 
 public:
-	Win32File(const std::wstring& path, std::shared_ptr<SystemParameters> sp);
-	Win32File(
+	Win32Directory(const std::wstring& path, std::shared_ptr<SystemParameters> sp);
+	Win32Directory(
 		const std::wstring& path,
 		std::shared_ptr<SystemParameters> sp,
 		std::shared_ptr<const Directory> dir);
 
-	virtual ~Win32File();
+	~Win32Directory() override;
+
+	vector<shared_ptr<Item>> getItems() const override;
 
 	HANDLE getHandle() const;
 
@@ -81,10 +78,18 @@ public:
 	const PACL getDacl() const override;
 	bool isDaclProtected() const override;
 
-	virtual std::ostream& dump(std::ostream& o) const
+	ostream& dump(ostream& o) const override
 	{
-		return o << "Win32File: " << path;
+		o << "Win32Directory: " << path << "\n" <<
+			"-----------------------------------------------" << endl;
+
+		for (auto i : getItems())
+		{
+			o << i->getPath() << endl;
+		}
+
+		return o;
 	}
 };
 
-#endif /* _WIN32_FILE_H */
+# endif /* _WIN32_DIRECTORY_H */

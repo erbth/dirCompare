@@ -1,6 +1,6 @@
 /** This file is part of dirCompare
  *
- * Copyright 2017 Thomas Erbesdobler <t.erbesdobler@team103.com>
+ * Copyright 2019 Thomas Erbesdobler <t.erbesdobler@team103.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,27 +15,16 @@
  * limitations under the License.
  */
 
-#ifndef _GP_EXCEPTION_H
-#define _GP_EXCEPTION_H
+#ifndef _WIN32_SECURITY_TOOLS_H
+#define _WIN32_SECURITY_TOOLS_H
 
-#include <exception>
+extern "C" {
+#include <Windows.h>
+#include <AclAPI.h>
+#include <AccCtrl.h>
+}
 
-#include <string>
+bool win32_explicit_aces_equal(const EXPLICIT_ACCESS &e1, const EXPLICIT_ACCESS &e2);
+bool win32_trustees_equal(const TRUSTEE& t1, const TRUSTEE& t2);
 
-class gp_exception : public std::exception
-{
-private:
-	const std::string msg;
-
-public:
-	gp_exception(const std::string& msg) : msg(msg)
-	{
-	}
-
-	virtual const char* what() const throw() override
-	{
-		return msg.c_str();
-	}
-};
-
-#endif /* _GP_EXCEPTION_H */
+#endif /* _WIN32_SECURITY_TOOLS_H */
