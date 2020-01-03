@@ -58,7 +58,7 @@ void Win32File::init()
 {
 	if (directory)
 	{
-		wpath = string_to_wstring(directory->getPath()) + L"\\" + wpath;
+		// wpath = string_to_wstring(directory->getPath()) + L"\\" + wpath;
 		path = wstring_to_string(wpath);
 	}
 	else
@@ -84,7 +84,7 @@ void Win32File::init()
 	}
 	
 	handle = CreateFileW(
-		wstring(L"\\\\?\\" + wpath).c_str(),
+		wstring(L"\\\\?\\" + (directory ? string_to_wstring(directory->getPath()) + L"\\" : L"") + wpath).c_str(),
 		GENERIC_READ,
 		FILE_SHARE_READ,
 		nullptr,
@@ -343,7 +343,7 @@ bool Win32File::compare_all_attributes_to(const Win32File* other, string& reason
 	}
 
 	/* Compare DACLs */
-	if (getDacl() == nullptr && other->getDacl() != nullptr || getDacl() != nullptr && other->getDacl() != nullptr)
+	if (getDacl() == nullptr && other->getDacl() != nullptr || getDacl() != nullptr && other->getDacl() == nullptr)
 	{
 		reason = "only one DACL is a NULL ACL";
 		return false;

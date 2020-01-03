@@ -32,7 +32,7 @@ void Win32Directory::init()
 {
 	if (directory)
 	{
-		wpath = string_to_wstring(directory->getPath()) + L"\\" + wpath;
+		// wpath = string_to_wstring(directory->getPath()) + L"\\" + wpath;
 		path = wstring_to_string(wpath);
 	}
 	else
@@ -57,7 +57,7 @@ void Win32Directory::init()
 	}
 
 	handle = CreateFileW(
-		wstring(L"\\\\?\\" + wpath).c_str(),
+		wstring(L"\\\\?\\" + (directory ? string_to_wstring(directory->getPath()) + L"\\" : L"") + wpath).c_str(),
 		GENERIC_READ,
 		FILE_SHARE_READ,
 		nullptr,
@@ -112,7 +112,7 @@ vector<shared_ptr<Item>> Win32Directory::getItems() const
 	HANDLE fh INVALID_HANDLE_VALUE;
 
 	if (wpath.size() >= 1 && wpath[wpath.size() - 1] != ':')
-		fh = FindFirstFileW(wstring(L"\\\\?\\" + wpath + L"\\*").c_str(), &fd);
+		fh = FindFirstFileW(wstring(L"\\\\?\\" + (directory ? string_to_wstring(directory->getPath()) + L"\\" : L"") + wpath + L"\\*").c_str(), &fd);
 	else
 		fh = FindFirstFileW(wstring(wpath + L"\\*").c_str(), &fd);
 
