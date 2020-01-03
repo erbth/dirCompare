@@ -1,6 +1,6 @@
 /** This file is part of dirCompare
  *
- * Copyright 2017 Thomas Erbesdobler <t.erbesdobler@team103.com>
+ * Copyright 2017-2020 Thomas Erbesdobler <t.erbesdobler@team103.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ static void printHelp()
 	cout << "This is dirCompare version " << DIR_COMPARE_VERSION_MAJOR
 		<< "." << DIR_COMPARE_VERSION_MINOR << endl << endl;
 
-	cout << "Copyright 2017-2019 Thomas Erbesdobler <t.erbesdobler@team103.com>"
+	cout << "Copyright 2017-2020 Thomas Erbesdobler <t.erbesdobler@team103.com>"
 		<< endl << endl;
 
 	cout << "Licensed under the Apache License, Version 2.0 (the \"License\");"
