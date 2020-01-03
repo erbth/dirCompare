@@ -72,7 +72,7 @@ private:
 			return;
 		}
 
-		msg = new char[utf8_size + 1];
+		msg = new char[(size_t)utf8_size + 1];
 		msg[utf8_size] = '\0';
 
 		utf8_size = WideCharToMultiByte(

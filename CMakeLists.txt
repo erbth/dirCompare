@@ -61,7 +61,6 @@ if (${TARGET_PLATFORM} STREQUAL WINDOWS_WIN32)
 		Win32Directory.cpp
 		win32_charset_conversion.cpp
 		Win32ItemFactory.cpp
-		Win32Item.cpp
 		win32_security_tools.cpp
 		Win32SimpleFileComparison.cpp
 		Win32ComparisonFactory.cpp

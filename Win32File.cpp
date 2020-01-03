@@ -26,6 +26,7 @@
 #include "Directory.h"
 #include "win32_error_exception.h"
 #include "win32_charset_conversion.h"
+#include "win32_security_tools.h"
 
 #include <iostream>
 
@@ -70,7 +71,7 @@ void Win32File::init()
 			throw win32_error_exception(GetLastError());
 		}
 
-		buf = new wchar_t[len + 1];
+		buf = new wchar_t[(size_t)len + 1];
 		
 		if (GetFullPathNameW(wpath.c_str(), len + 1, buf, nullptr) == 0)
 		{
@@ -277,4 +278,153 @@ bool Win32File::isDaclProtected() const
 	}
 
 	return sdc & SE_DACL_PROTECTED;
+}
+
+bool Win32File::compare_all_attributes_to(const Win32File* other, string& reason) const
+{
+	if (getType() != other->getType())
+	{
+		reason = "different type";
+		return false;
+	}
+
+	if (getSize() != other->getSize())
+	{
+		reason = "different size";
+		return false;
+	}
+
+	if (getCreationTime().QuadPart != other->getCreationTime().QuadPart)
+	{
+		reason = "different creation time";
+		return false;
+	}
+
+	if (getLastAccessTime().QuadPart != other->getLastAccessTime().QuadPart)
+	{
+		reason = "different last access time";
+		return false;
+	}
+
+	if (getLastWriteTime().QuadPart != other->getLastWriteTime().QuadPart)
+	{
+		reason = "different last write time";
+		return false;
+	}
+
+	if (getChangeTime().QuadPart != other->getChangeTime().QuadPart)
+	{
+		reason = "different change time";
+		return false;
+	}
+
+	if (getAttributes() != other->getAttributes())
+	{
+		reason = "different attributes";
+		return false;
+	}
+
+	if (!EqualSid(getOwner(), other->getOwner()))
+	{
+		reason = "different owners";
+		return false;
+	}
+
+	if (!EqualSid(getGroup(), other->getGroup()))
+	{
+		reason = "different primary group";
+		return false;
+	}
+
+	if (isDaclProtected() != other->isDaclProtected())
+	{
+		reason = "different DACL protection state (ACL inheritance)";
+		return false;
+	}
+
+	/* Compare DACLs */
+	if (getDacl() == nullptr && other->getDacl() != nullptr || getDacl() != nullptr && other->getDacl() != nullptr)
+	{
+		reason = "only one DACL is a NULL ACL";
+		return false;
+	}
+
+	PEXPLICIT_ACCESS peACEs1, peACEs2;
+	ULONG ceACEs1, ceACEs2;
+
+	auto ret = GetExplicitEntriesFromAcl(getDacl(), &ceACEs1, &peACEs1);
+	if (ret != ERROR_SUCCESS)
+		throw win32_error_exception(ret, L"GetExplicitEntriesFromAcl failed: ");
+
+	ret = GetExplicitEntriesFromAcl(other->getDacl(), &ceACEs2, &peACEs2);
+	if (ret != ERROR_SUCCESS)
+	{
+		LocalFree(peACEs1);
+		throw win32_error_exception(ret, L"GetExplicitEntriesFromAcl failed: ");
+	}
+
+	auto different = false;
+
+	if (ceACEs1 != ceACEs2)
+	{
+		reason = "different count of DACL entries";
+		different = true;
+	}
+
+	if (!different)
+	{
+		for (ULONG i = 0; i < ceACEs1; i++)
+		{
+			bool found = false;
+
+			for (ULONG j = 0; j < ceACEs1; j++)
+			{
+				if (win32_explicit_aces_equal(peACEs1[i], peACEs2[j]))
+				{
+					found = true;
+					break;
+				}
+			}
+
+			if (!found)
+			{
+				different = true;
+				reason = "different DACL entries";
+				break;
+			}
+		}
+	}
+
+	if (!different)
+	{
+		for (ULONG i = 0; i < ceACEs1; i++)
+		{
+			bool found = false;
+
+			for (ULONG j = 0; j < ceACEs1; j++)
+			{
+				if (win32_explicit_aces_equal(peACEs2[i], peACEs1[j]))
+				{
+					found = true;
+					break;
+				}
+			}
+
+			if (!found)
+			{
+				different = true;
+				reason = "different DACL entries";
+				break;
+			}
+		}
+	}
+
+	LocalFree(peACEs2);
+	LocalFree(peACEs1);
+
+	if (different)
+		return false;
+
+	/* All attributes seem to be equal. */
+	return true;
 }

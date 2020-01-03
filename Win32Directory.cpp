@@ -2,7 +2,10 @@
 #include "gp_exception.h"
 #include "win32_error_exception.h"
 #include "win32_charset_conversion.h"
+#include "platform.h"
+#include "win32_charset_conversion.h"
 #include <iostream>
+#include <algorithm>
 
 extern "C"
 {
@@ -41,7 +44,7 @@ void Win32Directory::init()
 			throw win32_error_exception(GetLastError());
 		}
 
-		buf = new wchar_t[len + 1];
+		buf = new wchar_t[(size_t)len + 1];
 
 		if (GetFullPathNameW(wpath.c_str(), len + 1, buf, nullptr) == 0)
 		{
@@ -59,7 +62,7 @@ void Win32Directory::init()
 		FILE_SHARE_READ,
 		nullptr,
 		OPEN_EXISTING,
-		0,
+		FILE_FLAG_BACKUP_SEMANTICS,
 		nullptr);
 
 	if (handle == INVALID_HANDLE_VALUE)
@@ -102,6 +105,61 @@ Win32Directory::~Win32Directory()
 vector<shared_ptr<Item>> Win32Directory::getItems() const
 {
 	vector<shared_ptr<Item>> v;
+
+	WIN32_FIND_DATAW fd;
+
+	/* "Prepending the string "\\?\" does not allow access to the root directory." - https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-findfirstfilew */
+	HANDLE fh INVALID_HANDLE_VALUE;
+
+	if (wpath.size() >= 1 && wpath[wpath.size() - 1] != ':')
+		fh = FindFirstFileW(wstring(L"\\\\?\\" + wpath + L"\\*").c_str(), &fd);
+	else
+		fh = FindFirstFileW(wstring(wpath + L"\\*").c_str(), &fd);
+
+	if (fh == INVALID_HANDLE_VALUE)
+		throw win32_error_exception(GetLastError(), L"Failed to list files in directory \"" + wpath + L"\": ");
+
+	auto factory = createItemFactory(sp);
+
+	for (;;)
+	{
+		wstring name(fd.cFileName);
+
+		if (name != L"." && name != L"..")
+		{
+			/* The factory will create an invalid file / directory as required. It's
+			 * safe to not care for that here. */
+			if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+				v.push_back(factory->createDirectory(wstring_to_string(name), shared_from_this()));
+			else
+				v.push_back(factory->createFile(wstring_to_string(name), shared_from_this()));
+		}
+
+		if (!FindNextFileW(fh, &fd))
+		{
+			auto e = GetLastError();
+			FindClose(fh);
+
+			if (e == ERROR_NO_MORE_FILES)
+				break;
+			else
+				throw win32_error_exception(e, L"Failed to list files in directory \"" + wpath + L"\": ");
+		}
+	}
+
+	sort(v.begin(), v.end(), [](shared_ptr<Item> i1, shared_ptr<Item> i2) {
+		string p1 = i1->getPath();
+		string p2 = i2->getPath();
+
+		if (p1.compare(p2) < 0)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+		});
 
 	return v;
 }

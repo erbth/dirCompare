@@ -150,7 +150,7 @@ bool SimpleDirectoryComparison::compare(
 					type = "directory ";
 				}
 
-				*(sp->getLog()) << type << p1 << " not in directory 2" << endl;
+				*(sp->getLog()) << type << "\"" << p1 << "\" not in directory 2" << endl;
 
 				it1++;
 			}
@@ -169,7 +169,7 @@ bool SimpleDirectoryComparison::compare(
 					type = "directory ";
 				}
 
-				*(sp->getLog()) << type << p2 << " not in directory 1" << endl;
+				*(sp->getLog()) << type << "\"" << p2 << "\" not in directory 1" << endl;
 
 				it2++;
 			}

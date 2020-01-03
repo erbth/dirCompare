@@ -85,8 +85,8 @@ bool ComparisonContext::compare(
 			{
 				logIndentation(sp->getLog(), f1);
 
-				*(sp->getLog()) << "files " << f1->getPath() << " and "
-					<< f2->getPath() << " differ" << (reason.empty() ? "" :
+				*(sp->getLog()) << "files \"" << f1->getPath() << "\" and \""
+					<< f2->getPath() << "\" differ" << (reason.empty() ? "" :
 					" (reason: " + reason + ")") << endl;
 			}
 
@@ -110,8 +110,8 @@ bool ComparisonContext::compare(
 			{
 				 logIndentation(sp->getLog(), d1);
 
-				*(sp->getLog()) << "directories " << d1->getPath() << " and "
-					<< d2->getPath() << " differ" << (reason.empty() ? "" :
+				*(sp->getLog()) << "directories \"" << d1->getPath() << "\" and \""
+					<< d2->getPath() << "\" differ" << (reason.empty() ? "" :
 					" (reason: " + reason + ")") << endl;
 			}
 

@@ -26,14 +26,13 @@
 #include "SystemParameters.h"
 #include "Directory.h"
 #include "Item.h"
-#include "Win32Item.h"
 
 extern "C"
 {
 #include <Windows.h>
 }
 
-class Win32Directory : public Directory, public Win32Item
+class Win32Directory : public Directory
 {
 private:
 	void init();
@@ -66,17 +65,17 @@ public:
 
 	HANDLE getHandle() const;
 
-	DWORD getType() const override;
-	uint64_t getSize() const override;
-	LARGE_INTEGER getCreationTime() const override;
-	LARGE_INTEGER getLastAccessTime() const override;
-	LARGE_INTEGER getLastWriteTime() const override;
-	LARGE_INTEGER getChangeTime() const override;
-	DWORD getAttributes() const override;
-	const PSID getOwner() const override;
-	const PSID getGroup() const override;
-	const PACL getDacl() const override;
-	bool isDaclProtected() const override;
+	DWORD getType() const;
+	uint64_t getSize() const;
+	LARGE_INTEGER getCreationTime() const;
+	LARGE_INTEGER getLastAccessTime() const;
+	LARGE_INTEGER getLastWriteTime() const;
+	LARGE_INTEGER getChangeTime() const;
+	DWORD getAttributes() const;
+	const PSID getOwner() const;
+	const PSID getGroup() const;
+	const PACL getDacl() const;
+	bool isDaclProtected() const;
 
 	ostream& dump(ostream& o) const override
 	{

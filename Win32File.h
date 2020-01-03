@@ -25,7 +25,6 @@
 #include "Item.h"
 #include "File.h"
 #include "Directory.h"
-#include "Win32Item.h"
 
 extern "C"
 {
@@ -34,7 +33,7 @@ extern "C"
 
 class Directory;
 
-class Win32File : public File, public Win32Item
+class Win32File : public File
 {
 private:
 	void init();
@@ -69,17 +68,19 @@ public:
 
 	HANDLE getHandle() const;
 
-	DWORD getType() const override;
-	uint64_t getSize() const override;
-	LARGE_INTEGER getCreationTime() const override;
-	LARGE_INTEGER getLastAccessTime() const override;
-	LARGE_INTEGER getLastWriteTime() const override;
-	LARGE_INTEGER getChangeTime() const override;
-	DWORD getAttributes() const override;
-	const PSID getOwner() const override;
-	const PSID getGroup() const override;
-	const PACL getDacl() const override;
-	bool isDaclProtected() const override;
+	DWORD getType() const;
+	uint64_t getSize() const;
+	LARGE_INTEGER getCreationTime() const;
+	LARGE_INTEGER getLastAccessTime() const;
+	LARGE_INTEGER getLastWriteTime() const;
+	LARGE_INTEGER getChangeTime() const;
+	DWORD getAttributes() const;
+	const PSID getOwner() const;
+	const PSID getGroup() const;
+	const PACL getDacl() const;
+	bool isDaclProtected() const;
+
+	bool compare_all_attributes_to(const Win32File* other, string& reason) const;
 
 	virtual std::ostream& dump(std::ostream& o) const
 	{
