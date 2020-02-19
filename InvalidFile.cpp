@@ -1,6 +1,6 @@
 /** This file is part of dirCompare
  *
- * Copyright 2017 Thomas Erbesdobler <t.erbesdobler@team103.com>
+ * Copyright 2017-2020 Thomas Erbesdobler <t.erbesdobler@team103.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,15 +26,30 @@ using namespace std;
 InvalidFile::InvalidFile(
 	const string& path,
 	shared_ptr<SystemParameters> sp)
-	: File(path, sp)
+	: File(sp)
 {
+	int pos = path.rfind('\\');
+	if (pos == string::npos)
+	{
+		name = path;
+		this->path = path;
+	}
+	else
+	{
+		if (pos == path.size() - 1)
+			name = '\\';
+		else
+			name = path.substr(pos + 1LL, path.size() - pos - 1);
+
+		this->path = path;
+	}
 }
 
 InvalidFile::InvalidFile(
-	const string& path,
+	const string& name,
 	shared_ptr<SystemParameters> sp,
 	shared_ptr<const Directory> dir)
-	: File(path, sp, dir)
+	: File(name, dir->getPath() + "\\" + name, sp, dir)
 {
 }
 

@@ -26,7 +26,7 @@
 #include "Directory.h"
 #include "win32_error_exception.h"
 #include "win32_charset_conversion.h"
-#include "win32_security_tools.h"
+#include "win32_templates.h"
 
 #include <iostream>
 
@@ -40,51 +40,67 @@ extern "C"
 using namespace std;
 
 Win32File::Win32File(const wstring& wpath, shared_ptr<SystemParameters> sp)
-	: File(string(), sp), wpath(wpath)
+	: File(sp)
 {
+	int pos = wpath.rfind(L'\\');
+	if (pos == wstring::npos)
+	{
+		/* It is a file name */
+		this->wname = wpath;
+		this->wpath = wpath;
+	}
+	else
+	{
+		/* It is a path */
+		this->wname = wpath.substr(pos + 1LL, wpath.size() - pos - 1);
+		this->wpath =  wpath;
+	}
+
+	LPWSTR buf = nullptr;
+
+	DWORD len = GetFullPathNameW(this->wpath.c_str(), 0, nullptr, nullptr);
+	if (len == 0)
+	{
+		throw win32_error_exception(GetLastError());
+	}
+
+	buf = new wchar_t[(size_t)len + 1];
+		
+	if (GetFullPathNameW(this->wpath.c_str(), len + 1, buf, nullptr) == 0)
+	{
+		delete[] buf;
+		throw win32_error_exception(GetLastError());
+	}
+
+	this->wpath = wstring(buf);
+
+	this->name = wstring_to_string(this->wname);
+	this->path = wstring_to_string(this->wpath);
+
 	init();
 }
 
 Win32File::Win32File(
-	const wstring& wpath,
+	const wstring& wname,
 	shared_ptr<SystemParameters> sp,
 	shared_ptr<const Directory> dir)
-	: File(string(), sp, dir), wpath(wpath)
+	: File(sp, dir)
 {
+	this->wname = wname;
+	this->wpath = string_to_wstring(dir->getPath()) + L"\\" + this->wname;
+
+	this->name = wstring_to_string(this->wname);
+	this->path = wstring_to_string(this->wpath);
+
 	init();
 }
 
 void Win32File::init()
 {
-	if (directory)
-	{
-		// wpath = string_to_wstring(directory->getPath()) + L"\\" + wpath;
-		path = wstring_to_string(wpath);
-	}
-	else
-	{
-		LPWSTR buf = nullptr;
-
-		DWORD len = GetFullPathNameW(wpath.c_str(), 0, nullptr, nullptr);
-		if (len == 0)
-		{
-			throw win32_error_exception(GetLastError());
-		}
-
-		buf = new wchar_t[(size_t)len + 1];
-		
-		if (GetFullPathNameW(wpath.c_str(), len + 1, buf, nullptr) == 0)
-		{
-			delete[] buf;
-			throw win32_error_exception(GetLastError());
-		}
-
-		wpath = wstring(buf);
-		path = wstring_to_string(wpath);
-	}
+	// wcout << L"File name: \"" << wname << "\", path: \"" << wpath << L"\"" << endl;
 	
 	handle = CreateFileW(
-		wstring(L"\\\\?\\" + (directory ? string_to_wstring(directory->getPath()) + L"\\" : L"") + wpath).c_str(),
+		wpath.c_str(),
 		GENERIC_READ,
 		FILE_SHARE_READ,
 		nullptr,
@@ -282,149 +298,5 @@ bool Win32File::isDaclProtected() const
 
 bool Win32File::compare_all_attributes_to(const Win32File* other, string& reason) const
 {
-	if (getType() != other->getType())
-	{
-		reason = "different type";
-		return false;
-	}
-
-	if (getSize() != other->getSize())
-	{
-		reason = "different size";
-		return false;
-	}
-
-	if (getCreationTime().QuadPart != other->getCreationTime().QuadPart)
-	{
-		reason = "different creation time";
-		return false;
-	}
-
-	if (getLastAccessTime().QuadPart != other->getLastAccessTime().QuadPart)
-	{
-		reason = "different last access time";
-		return false;
-	}
-
-	if (getLastWriteTime().QuadPart != other->getLastWriteTime().QuadPart)
-	{
-		reason = "different last write time";
-		return false;
-	}
-
-	if (getChangeTime().QuadPart != other->getChangeTime().QuadPart)
-	{
-		reason = "different change time";
-		return false;
-	}
-
-	if (getAttributes() != other->getAttributes())
-	{
-		reason = "different attributes";
-		return false;
-	}
-
-	if (!EqualSid(getOwner(), other->getOwner()))
-	{
-		reason = "different owners";
-		return false;
-	}
-
-	if (!EqualSid(getGroup(), other->getGroup()))
-	{
-		reason = "different primary group";
-		return false;
-	}
-
-	if (isDaclProtected() != other->isDaclProtected())
-	{
-		reason = "different DACL protection state (ACL inheritance)";
-		return false;
-	}
-
-	/* Compare DACLs */
-	if (getDacl() == nullptr && other->getDacl() != nullptr || getDacl() != nullptr && other->getDacl() == nullptr)
-	{
-		reason = "only one DACL is a NULL ACL";
-		return false;
-	}
-
-	PEXPLICIT_ACCESS peACEs1, peACEs2;
-	ULONG ceACEs1, ceACEs2;
-
-	auto ret = GetExplicitEntriesFromAcl(getDacl(), &ceACEs1, &peACEs1);
-	if (ret != ERROR_SUCCESS)
-		throw win32_error_exception(ret, L"GetExplicitEntriesFromAcl failed: ");
-
-	ret = GetExplicitEntriesFromAcl(other->getDacl(), &ceACEs2, &peACEs2);
-	if (ret != ERROR_SUCCESS)
-	{
-		LocalFree(peACEs1);
-		throw win32_error_exception(ret, L"GetExplicitEntriesFromAcl failed: ");
-	}
-
-	auto different = false;
-
-	if (ceACEs1 != ceACEs2)
-	{
-		reason = "different count of DACL entries";
-		different = true;
-	}
-
-	if (!different)
-	{
-		for (ULONG i = 0; i < ceACEs1; i++)
-		{
-			bool found = false;
-
-			for (ULONG j = 0; j < ceACEs1; j++)
-			{
-				if (win32_explicit_aces_equal(peACEs1[i], peACEs2[j]))
-				{
-					found = true;
-					break;
-				}
-			}
-
-			if (!found)
-			{
-				different = true;
-				reason = "different DACL entries";
-				break;
-			}
-		}
-	}
-
-	if (!different)
-	{
-		for (ULONG i = 0; i < ceACEs1; i++)
-		{
-			bool found = false;
-
-			for (ULONG j = 0; j < ceACEs1; j++)
-			{
-				if (win32_explicit_aces_equal(peACEs2[i], peACEs1[j]))
-				{
-					found = true;
-					break;
-				}
-			}
-
-			if (!found)
-			{
-				different = true;
-				reason = "different DACL entries";
-				break;
-			}
-		}
-	}
-
-	LocalFree(peACEs2);
-	LocalFree(peACEs1);
-
-	if (different)
-		return false;
-
-	/* All attributes seem to be equal. */
-	return true;
+	return compare_all_win32_item_attributes(this, other, reason);
 }

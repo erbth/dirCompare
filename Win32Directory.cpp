@@ -21,6 +21,7 @@
 #include "win32_charset_conversion.h"
 #include "platform.h"
 #include "win32_charset_conversion.h"
+#include "win32_templates.h"
 #include <iostream>
 #include <algorithm>
 
@@ -33,47 +34,74 @@ extern "C"
 
 using namespace std;
 
-Win32Directory::Win32Directory(const wstring& path, shared_ptr<SystemParameters> sp) :
-	Directory(string(), sp), wpath(path)
+Win32Directory::Win32Directory(const wstring& wpath, shared_ptr<SystemParameters> sp) :
+	Directory(sp)
 {
+	int pos = wpath.rfind(L'\\');
+	if (pos == wstring::npos)
+	{
+		/* It is a directory name */
+		this->wname = wpath;
+		this->wpath = wpath;
+	}
+	else
+	{
+		if (wpath.size() > 2 && wpath.substr(wpath.size() - 2, 2) == L":\\")
+		{
+			/* It is a root directory */
+			this->wname = L"\\";
+			this->wpath = wpath;
+		}
+		else
+		{
+			/* It is a path */
+			this->wname = wpath.substr(pos + 1LL, wpath.size() - pos - 1);
+			this->wpath =  wpath;
+		}
+	}
+
+	LPWSTR buf = nullptr;
+
+	DWORD len = GetFullPathNameW(this->wpath.c_str(), 0, nullptr, nullptr);
+	if (len == 0)
+	{
+		throw win32_error_exception(GetLastError());
+	}
+
+	buf = new wchar_t[(size_t)len + 1];
+		
+	if (GetFullPathNameW(this->wpath.c_str(), len + 1, buf, nullptr) == 0)
+	{
+		delete[] buf;
+		throw win32_error_exception(GetLastError());
+	}
+
+	this->wpath = wstring(buf);
+
+	this->name = wstring_to_string(this->wname);
+	this->path = wstring_to_string(this->wpath);
+
 	init();
 };
 
-Win32Directory::Win32Directory(const wstring& path, shared_ptr<SystemParameters> sp, shared_ptr<const Directory> dir) :
-	Directory(string(), sp, dir), wpath(path)
+Win32Directory::Win32Directory(const wstring& wname, shared_ptr<SystemParameters> sp, shared_ptr<const Directory> dir) :
+	Directory(sp, dir)
 {
+	this->wname = wname;
+	this->wpath = string_to_wstring(dir->getPath()) + L"\\" + this->wname;
+
+	this->name = wstring_to_string(this->wname);
+	this->path = wstring_to_string(this->wpath);
+
 	init();
 };
 
 void Win32Directory::init()
 {
-	if (directory)
-	{
-		path = wstring_to_string(wpath);
-	}
-	else
-	{
-		LPWSTR buf = nullptr;
-		DWORD len = GetFullPathNameW(wpath.c_str(), 0, nullptr, nullptr);
-		if (len == 0)
-		{
-			throw win32_error_exception(GetLastError());
-		}
-
-		buf = new wchar_t[(size_t)len + 1];
-
-		if (GetFullPathNameW(wpath.c_str(), len + 1, buf, nullptr) == 0)
-		{
-			delete[] buf;
-			throw win32_error_exception(GetLastError());
-		}
-
-		wpath = wstring(buf);
-		path = wstring_to_string(wpath);
-	}
+	// wcout << L"Directory name: \"" << wname << "\", path: \"" << wpath << L"\"" << endl;
 
 	handle = CreateFileW(
-		wstring(L"\\\\?\\" + (directory ? string_to_wstring(directory->getPath()) + L"\\" : L"") + wpath).c_str(),
+		wpath.c_str(),
 		GENERIC_READ,
 		FILE_SHARE_READ,
 		nullptr,
@@ -124,13 +152,13 @@ vector<shared_ptr<Item>> Win32Directory::getItems() const
 
 	WIN32_FIND_DATAW fd;
 
-	/* "Prepending the string "\\?\" does not allow access to the root directory." - https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-findfirstfilew */
 	wstring dir_path;
 
+	/* "Prepending the string "\\?\" does not allow access to the root directory." - https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-findfirstfilew */
 	if (wpath.size() >= 2 && wpath.substr(wpath.size() - 2, 2) == L":\\")
 		dir_path = wpath + L"*";
 	else
-		dir_path = L"\\\\?\\" + (directory ? string_to_wstring(directory->getPath()) + L"\\" : L"") + wpath + L"\\*";	
+		dir_path = L"\\\\?\\" + wpath + L"\\*";	
 
 	HANDLE fh = FindFirstFileW(dir_path.c_str(), & fd);
 	if (fh == INVALID_HANDLE_VALUE)
@@ -165,8 +193,8 @@ vector<shared_ptr<Item>> Win32Directory::getItems() const
 	}
 
 	sort(v.begin(), v.end(), [](shared_ptr<Item> i1, shared_ptr<Item> i2) {
-		string p1 = i1->getPath();
-		string p2 = i2->getPath();
+		string p1 = i1->getName();
+		string p2 = i2->getName();
 
 		if (p1.compare(p2) < 0)
 		{
@@ -298,3 +326,9 @@ bool Win32Directory::isDaclProtected() const
 
 	return sdc & SE_DACL_PROTECTED;
 }
+
+bool Win32Directory::compare_all_attributes_to(const Win32Directory* other, string& reason) const
+{
+	return compare_all_win32_item_attributes(this, other, reason);
+}
+

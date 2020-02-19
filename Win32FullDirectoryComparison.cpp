@@ -1,6 +1,6 @@
 /** This file is part of dirCompare
  *
- * Copyright 2017-2020 Thomas Erbesdobler <t.erbesdobler@team103.com>
+ * Copyright 2020 Thomas Erbesdobler <t.erbesdobler@team103.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,18 +23,19 @@
 #include "log.h"
 #include "Item.h"
 #include "Directory.h"
+#include "Win32Directory.h"
 #include "InvalidDirectory.h"
-#include "SimpleDirectoryComparison.h"
+#include "Win32FullDirectoryComparison.h"
 #include "ComparisonContext.h"
 #include "ignoring.h"
 
-SimpleDirectoryComparison::SimpleDirectoryComparison(
+Win32FullDirectoryComparison::Win32FullDirectoryComparison(
 	shared_ptr<SystemParameters> sp)
 	: DirectoryComparisonStrategy(sp)
 {
 }
 
-bool SimpleDirectoryComparison::compare(
+bool Win32FullDirectoryComparison::compare(
 	shared_ptr<const Directory> d1,
 	shared_ptr<const Directory> d2,
 	string* reason) const
@@ -44,6 +45,7 @@ bool SimpleDirectoryComparison::compare(
 		throw gp_exception("comparison context not set");
 	}
 
+	/* If one of the directories is invalid, we are done. */
 	{
 		shared_ptr<const InvalidDirectory> id1;
 		
@@ -71,6 +73,7 @@ bool SimpleDirectoryComparison::compare(
 		}
 	}
 
+	/* Compare the directories' contents */
 	vector<shared_ptr<Item>> itemsD1;
 	vector<shared_ptr<Item>> itemsD2;
 	
@@ -102,9 +105,7 @@ bool SimpleDirectoryComparison::compare(
 	for (;;)
 	{
 		if (it1 == itemsD1.end() && it2 == itemsD2.end())
-		{
-			return equal;
-		}
+			break;
 		
 		string p1 = it1 != itemsD1.end() ? (*it1)->getName() : string();
 		string p2 = it2 != itemsD2.end() ? (*it2)->getName() : string();
@@ -175,15 +176,52 @@ bool SimpleDirectoryComparison::compare(
 			}
 		}
 	}
+
+	if (!equal)
+		*reason = "different content";
+
+	/* Compare the directories' attributes */
+	auto wd1 = dynamic_pointer_cast<const Win32Directory>(d1);
+	auto wd2 = dynamic_pointer_cast<const Win32Directory>(d2);
+
+	try
+	{
+		string attr_reason;
+
+		if (!wd1->compare_all_attributes_to(wd2.get(), attr_reason))
+		{
+			*reason = equal ? attr_reason : (*reason + "; " + attr_reason);
+			equal = false;
+		}
+	}
+	catch (exception& e)
+	{
+		logIndentation(sp->getLog(), wd1);
+
+		*(sp->getLog()) << "Error while comparing attributes of directories \"" <<
+			wd1->getPath() << "\", \"" << wd2->getPath() <<
+			"\": " << e.what() << endl;
+	}
+	catch (...)
+	{
+		logIndentation(sp->getLog(), wd1);
+
+		*(sp->getLog()) << "Unknown error while comparing attributes of directories \"" <<
+			wd1->getPath() << "\", \"" << wd2->getPath() <<
+			"\"" << endl;
+	}
+
+	return equal;
 }
 
-const string SimpleDirectoryComparison::getID() const
+const string Win32FullDirectoryComparison::getID() const
 {
-	return "simple";
+	return "full";
 }
 
-const string SimpleDirectoryComparison::getDescription() const
+const string Win32FullDirectoryComparison::getDescription() const
 {
-	return "simple platfrom independent recursive directory comparison, "
-		"compares only directory content (recursively)";
+	return "Recursive directory comparison strategy for win32, "
+		"compares the directories content (recursively) and the their attributes in post-order traversal. "
+		"That is contents are always compared first and then the directories' attributes.";
 }

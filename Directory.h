@@ -1,6 +1,6 @@
 /** This file is part of dirCompare
  *
- * Copyright 2017 Thomas Erbesdobler <t.erbesdobler@team103.com>
+ * Copyright 2017-2020 Thomas Erbesdobler <t.erbesdobler@team103.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,22 +26,24 @@
 #include "SystemParameters.h"
 #include "Item.h"
 
-using namespace std;
-
-class Directory : public Item, public enable_shared_from_this<Directory>
+class Directory : public Item, public std::enable_shared_from_this<Directory>
 {
-public:
-	Directory(const string& path, shared_ptr<SystemParameters> sp);
+protected:
+	Directory(std::shared_ptr<SystemParameters> sp);
+	Directory(const std::string& name, const std::string& path, std::shared_ptr<SystemParameters> sp);
+	Directory(std::shared_ptr<SystemParameters> sp, std::shared_ptr<const Directory> dir);
 	Directory(
-		const string& path,
-		shared_ptr<SystemParameters> sp,
-		shared_ptr<const Directory> dir);
+		const std::string& name,
+		const std::string& path,
+		std::shared_ptr<SystemParameters> sp,
+		std::shared_ptr<const Directory> dir);
 
-	virtual ~Directory();
+public:
+	virtual ~Directory() = 0;
 
-	virtual vector<shared_ptr<Item>> getItems() const = 0;
+	virtual std::vector<std::shared_ptr<Item>> getItems() const = 0;
 
-	virtual ostream& dump(ostream& o) const
+	virtual std::ostream& dump(std::ostream& o) const
 	{
 		o << "Directory: " << path << "\n" <<
 			"-----------------------------------------------" << endl;

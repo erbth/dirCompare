@@ -1,6 +1,6 @@
 /** This file is part of dirCompare
  *
- * Copyright 2017 Thomas Erbesdobler <t.erbesdobler@team103.com>
+ * Copyright 2017-2020 Thomas Erbesdobler <t.erbesdobler@team103.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,9 @@
 
 using namespace std;
 
-Item::Item(const string& path, shared_ptr<SystemParameters> sp)
+Item::Item(const string& name, const string& path, shared_ptr<SystemParameters> sp)
 {
+	this->name = name;
 	this->path.assign(path);
 	this->sp = sp;
 	level = 0;
@@ -33,6 +34,7 @@ Item::Item(const string& path, shared_ptr<SystemParameters> sp)
 }
 
 Item::Item(
+	const string& name,
 	const string& path,
 	shared_ptr<SystemParameters> sp,
 	shared_ptr<const Directory> dir)
@@ -45,6 +47,11 @@ Item::Item(
 
 Item::~Item()
 {
+}
+
+const string& Item::getName() const
+{
+	return name;
 }
 
 const string& Item::getPath() const

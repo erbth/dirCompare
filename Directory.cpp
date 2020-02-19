@@ -1,6 +1,6 @@
 /** This file is part of dirCompare
  *
- * Copyright 2017 Thomas Erbesdobler <t.erbesdobler@team103.com>
+ * Copyright 2017-2020 Thomas Erbesdobler <t.erbesdobler@team103.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,16 +25,27 @@
 
 using namespace std;
 
-Directory::Directory(const string& path, shared_ptr<SystemParameters> sp)
-	: Item(path, sp)
+Directory::Directory(shared_ptr<SystemParameters> sp)
+	: Item(string(), string(), sp)
+{
+}
+
+Directory::Directory(const string& name, const string& path, shared_ptr<SystemParameters> sp)
+	: Item(name, path, sp)
+{
+}
+
+Directory::Directory(shared_ptr<SystemParameters> sp, shared_ptr<const Directory> dir)
+	: Item(string(), string(), sp, dir)
 {
 }
 
 Directory::Directory(
+	const string& name,
 	const string& path,
 	shared_ptr<SystemParameters> sp,
 	shared_ptr<const Directory> dir)
-	: Item(path, sp, dir)
+	: Item(name, path, sp, dir)
 {
 }
 

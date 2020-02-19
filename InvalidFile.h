@@ -1,6 +1,6 @@
 /** This file is part of dirCompare
  *
- * Copyright 2017 Thomas Erbesdobler <t.erbesdobler@team103.com>
+ * Copyright 2017-2020 Thomas Erbesdobler <t.erbesdobler@team103.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,13 +30,13 @@ class InvalidFile : public File, public InvalidItem
 public:
 	InvalidFile(const std::string& path, shared_ptr<SystemParameters> sp);
 	InvalidFile(
-		const std::string& path,
-		shared_ptr<SystemParameters> sp,
-		shared_ptr<const Directory> dir);
+		const std::string& name,
+		std::shared_ptr<SystemParameters> sp,
+		std::shared_ptr<const Directory> dir);
 	
 	virtual const std::string getErrorDescription() const override;
 
-	virtual ostream& dump(ostream& o) const override
+	virtual std::ostream& dump(std::ostream& o) const override
 	{
 		return o << "InvalidFile: \"" << path << "\", Error: " <<
 			getErrorMessage();

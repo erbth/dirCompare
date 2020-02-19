@@ -1,6 +1,6 @@
 /** This file is part of dirCompare
  *
- * Copyright 2017 Thomas Erbesdobler <t.erbesdobler@team103.com>
+ * Copyright 2020 Thomas Erbesdobler <t.erbesdobler@team103.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,39 +15,27 @@
  * limitations under the License.
  */
 
-#include <memory>
+#ifndef _WIN32_FULL_DIRECTORY_COMPARISON_H
+#define _WIN32_FULL_DIRECTORY_COMPARISON_H
+
 #include <string>
+#include <memory>
 #include "SystemParameters.h"
-#include "File.h"
 #include "Directory.h"
-#include "Item.h"
+#include "DirectoryComparisonStrategy.h"
 
-using namespace std;
-
-File::File(shared_ptr<SystemParameters> sp)
-	: Item(string(), string(), sp)
+class Win32FullDirectoryComparison : public DirectoryComparisonStrategy
 {
-}
+public:
+	Win32FullDirectoryComparison(std::shared_ptr<SystemParameters> sp);
 
-File::File(const string& name, const string& path, shared_ptr<SystemParameters> sp)
-	: Item(name, path, sp)
-{
-}
+	virtual bool compare(
+		std::shared_ptr<const Directory> d1,
+		std::shared_ptr<const Directory> d2,
+		std::string* reason = nullptr) const override;
 
-File::File(shared_ptr<SystemParameters> sp, shared_ptr<const Directory> dir)
-	: Item(string(), string(), sp, dir)
-{
-}
+	virtual const std::string getID() const override;
+	virtual const std::string getDescription() const override;
+};
 
-File::File(
-	const string& name,
-	const string& path,
-	shared_ptr<SystemParameters> sp,
-	shared_ptr<const Directory> dir)
-	: Item(name, path, sp, dir)
-{
-}
-
-File::~File()
-{
-}
+#endif /* _WIN32_FULL_DIRECTORY_COMPARISON_H */

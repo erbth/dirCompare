@@ -40,6 +40,7 @@ private:
 	
 protected:
 	HANDLE handle = INVALID_HANDLE_VALUE;
+	std::wstring wname;
 	std::wstring wpath;
 
 	mutable DWORD fileType = FILE_TYPE_UNKNOWN;
@@ -60,7 +61,7 @@ protected:
 public:
 	Win32File(const std::wstring& path, std::shared_ptr<SystemParameters> sp);
 	Win32File(
-		const std::wstring& path,
+		const std::wstring& name,
 		std::shared_ptr<SystemParameters> sp,
 		std::shared_ptr<const Directory> dir);
 

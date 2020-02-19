@@ -23,6 +23,7 @@
 #include "Win32ComparisonFactory.h"
 #include "Win32SimpleFileComparison.h"
 #include "SimpleDirectoryComparison.h"
+#include "Win32FullDirectoryComparison.h"
 
 using namespace std;
 
@@ -47,6 +48,7 @@ vector<shared_ptr<DirectoryComparisonStrategy>>
 	vector<shared_ptr<DirectoryComparisonStrategy>> v;
 
 	v.push_back(make_shared<SimpleDirectoryComparison>(sp));
+	v.push_back(make_shared<Win32FullDirectoryComparison>(sp));
 
 	return v;
 }

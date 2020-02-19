@@ -39,6 +39,7 @@ private:
 
 protected:
 	HANDLE handle = INVALID_HANDLE_VALUE;
+	std::wstring wname;
 	std::wstring wpath;
 
 	mutable FILE_BASIC_INFO fbi;
@@ -55,7 +56,7 @@ protected:
 public:
 	Win32Directory(const std::wstring& path, std::shared_ptr<SystemParameters> sp);
 	Win32Directory(
-		const std::wstring& path,
+		const std::wstring& name,
 		std::shared_ptr<SystemParameters> sp,
 		std::shared_ptr<const Directory> dir);
 
@@ -76,6 +77,8 @@ public:
 	const PSID getGroup() const;
 	const PACL getDacl() const;
 	bool isDaclProtected() const;
+
+	bool compare_all_attributes_to(const Win32Directory* other, string& reason) const;
 
 	ostream& dump(ostream& o) const override
 	{

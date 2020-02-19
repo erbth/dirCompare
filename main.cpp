@@ -152,9 +152,25 @@ static int dirCompare(int argc, char** argv)
 
 		auto f = createItemFactory(sp);
 
-		/* test directory */
-		auto d1 = f->createDirectory(sp->getDirectory1());
-		auto d2 = f->createDirectory(sp->getDirectory2());
+		/* Compare directories */
+		auto dir1 = sp->getDirectory1();
+		auto dir2 = sp->getDirectory2();
+
+		/* Be relaxed with misspelled directory names. */
+		while (dir1.size() > 0 && *dir1.crbegin() == L'\\')
+			dir1.pop_back();
+
+		if (dir1.size() > 0 && *dir1.crbegin() == L':')
+			dir1.push_back(L'\\');
+
+		while (dir2.size() > 0 && *dir2.crbegin() == L'\\')
+			dir2.pop_back();
+
+		if (dir2.size() > 0 && *dir2.crbegin() == L':')
+			dir2.push_back(L'\\');
+
+		auto d1 = f->createDirectory(dir1);
+		auto d2 = f->createDirectory(dir2);
 
 		bool equal = cc.compare(d1, d2);
 		*(sp->getLog()) << (equal ? "match" : "differ") << endl;

@@ -64,6 +64,7 @@ if (${TARGET_PLATFORM} STREQUAL WINDOWS_WIN32)
 		Win32ItemFactory.cpp
 		win32_security_tools.cpp
 		Win32SimpleFileComparison.cpp
+		Win32FullDirectoryComparison.cpp
 		Win32ComparisonFactory.cpp
 	)
 elseif (${TARGET_PLATFORM} STREQUAL LINUX)

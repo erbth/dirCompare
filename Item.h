@@ -1,6 +1,6 @@
 /** This file is part of dirCompare
  *
- * Copyright 2017 Thomas Erbesdobler <t.erbesdobler@team103.com>
+ * Copyright 2017-2020 Thomas Erbesdobler <t.erbesdobler@team103.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,36 +23,37 @@
 #include <string>
 #include "SystemParameters.h"
 
-using namespace std;
-
 class Directory;
 
 class Item
 {
 protected:
-	shared_ptr<SystemParameters> sp;
-	string path;
+	std::shared_ptr<SystemParameters> sp;
+	std::string name;
+	std::string path;
 	int level;
-	shared_ptr<const Directory> directory;
+	std::shared_ptr<const Directory> directory;
+
+	Item(const std::string& name, const std::string& path, std::shared_ptr<SystemParameters> sp);
+	Item(
+		const std::string& name,
+		const std::string& path,
+		std::shared_ptr<SystemParameters> sp,
+		std::shared_ptr<const Directory> dir);
 
 public:
-	Item(const string& path, shared_ptr<SystemParameters> sp);
-	Item(
-		const string& path,
-		shared_ptr<SystemParameters> sp,
-		shared_ptr<const Directory> dir);
+	virtual ~Item() = 0;
 
-	virtual ~Item();
-
-	const string& getPath() const;
+	const std::string& getName() const;
+	const std::string& getPath() const;
 	const int getLevel() const;
 
-	virtual ostream& dump(ostream& o) const
+	virtual std::ostream& dump(std::ostream& o) const
 	{
 		return o << "Item: " << path;
 	}
 };
 
-ostream& operator<<(ostream& o, const Item *i);
+std::ostream& operator<<(std::ostream& o, const Item *i);
 
 #endif /* _ITEM_H */
