@@ -101,27 +101,28 @@ bool SimpleDirectoryComparison::compare(
 
 	for (;;)
 	{
-		if (it1 == itemsD1.end() && it2 == itemsD2.end())
-		{
-			return equal;
-		}
-		
-		string p1 = it1 != itemsD1.end() ? (*it1)->getName() : string();
-		string p2 = it2 != itemsD2.end() ? (*it2)->getName() : string();
+		bool have_p1 = it1 != itemsD1.cend();
+		bool have_p2 = it2 != itemsD2.cend();
 
-		if (!p1.empty() && ignoreItem(*it1, sp))
+		if (!have_p1 && !have_p2)
+			return equal;
+		
+		string name_p1 = have_p1 ? (*it1)->getName() : string();
+		string name_p2 = have_p2 ? (*it2)->getName() : string();
+
+		if (have_p1 && ignoreItem(*it1, sp))
 		{
 			it1++;
 			continue;
 		}
 
-		if (!p2.empty() && ignoreItem(*it2, sp))
+		if (have_p2 && ignoreItem(*it2, sp))
 		{
 			it2++;
 			continue;
 		}
 
-		if (p1 == p2)
+		if (have_p1 && have_p2 && name_p1 == name_p2)
 		{
 			if (!comparisonContext->compare(*it1, *it2))
 			{
@@ -135,7 +136,7 @@ bool SimpleDirectoryComparison::compare(
 		{
 			equal = false;
 
-			if (p2.empty() || !p1.empty() && p1.compare(p2) < 0)
+			if (!have_p2 || have_p1 && name_p1.compare(name_p2) < 0)
 			{
 				logIndentation(sp->getLog(), *it1);
 
@@ -150,11 +151,11 @@ bool SimpleDirectoryComparison::compare(
 					type = "directory ";
 				}
 
-				*(sp->getLog()) << type << "\"" << p1 << "\" not in directory 2" << endl;
+				*(sp->getLog()) << type << "\"" << name_p1 << "\" not in directory 2" << endl;
 
 				it1++;
 			}
-			else if (p1.empty() || !p2.empty() && p1.compare(p2) > 0)
+			else if (!have_p1 || have_p2 && name_p1.compare(name_p2) > 0)
 			{
 				logIndentation(sp->getLog(), *it2);
 
@@ -169,7 +170,7 @@ bool SimpleDirectoryComparison::compare(
 					type = "directory ";
 				}
 
-				*(sp->getLog()) << type << "\"" << p2 << "\" not in directory 1" << endl;
+				*(sp->getLog()) << type << "\"" << name_p2 << "\" not in directory 1" << endl;
 
 				it2++;
 			}
