@@ -88,7 +88,12 @@ Win32Directory::Win32Directory(const wstring& wname, shared_ptr<SystemParameters
 	Directory(sp, dir)
 {
 	this->wname = wname;
-	this->wpath = string_to_wstring(dir->getPath()) + L"\\" + this->wname;
+
+	auto p = string_to_wstring(dir->getPath());
+	if (p.size() == 0 || *p.crbegin() != L'\\')
+		p.push_back(L'\\');
+
+	this->wpath = p + this->wname;
 
 	this->name = wstring_to_string(this->wname);
 	this->path = wstring_to_string(this->wpath);
@@ -159,6 +164,8 @@ vector<shared_ptr<Item>> Win32Directory::getItems() const
 		dir_path = wpath + L"*";
 	else
 		dir_path = L"\\\\?\\" + wpath + L"\\*";	
+
+	// wcout << L"dir search pattern: \"" << dir_path << "\"" << endl;
 
 	HANDLE fh = FindFirstFileW(dir_path.c_str(), & fd);
 	if (fh == INVALID_HANDLE_VALUE)
