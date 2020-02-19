@@ -49,7 +49,6 @@ void Win32Directory::init()
 {
 	if (directory)
 	{
-		// wpath = string_to_wstring(directory->getPath()) + L"\\" + wpath;
 		path = wstring_to_string(wpath);
 	}
 	else
@@ -126,13 +125,14 @@ vector<shared_ptr<Item>> Win32Directory::getItems() const
 	WIN32_FIND_DATAW fd;
 
 	/* "Prepending the string "\\?\" does not allow access to the root directory." - https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-findfirstfilew */
-	HANDLE fh INVALID_HANDLE_VALUE;
+	wstring dir_path;
 
-	if (wpath.size() >= 1 && wpath[wpath.size() - 1] != ':')
-		fh = FindFirstFileW(wstring(L"\\\\?\\" + (directory ? string_to_wstring(directory->getPath()) + L"\\" : L"") + wpath + L"\\*").c_str(), &fd);
+	if (wpath.size() >= 2 && wpath.substr(wpath.size() - 2, 2) == L":\\")
+		dir_path = wpath + L"*";
 	else
-		fh = FindFirstFileW(wstring(wpath + L"\\*").c_str(), &fd);
+		dir_path = L"\\\\?\\" + (directory ? string_to_wstring(directory->getPath()) + L"\\" : L"") + wpath + L"\\*";	
 
+	HANDLE fh = FindFirstFileW(dir_path.c_str(), & fd);
 	if (fh == INVALID_HANDLE_VALUE)
 		throw win32_error_exception(GetLastError(), L"Failed to list files in directory \"" + wpath + L"\": ");
 
