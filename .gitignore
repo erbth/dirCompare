@@ -6,3 +6,7 @@ build
 
 # test directories
 testDir*
+
+# VS dirs
+/.vs
+/CMakeSettings.json
