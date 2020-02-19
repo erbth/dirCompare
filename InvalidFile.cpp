@@ -49,8 +49,15 @@ InvalidFile::InvalidFile(
 	const string& name,
 	shared_ptr<SystemParameters> sp,
 	shared_ptr<const Directory> dir)
-	: File(name, dir->getPath() + "\\" + name, sp, dir)
+	: File(sp, dir)
 {
+	this->name = name;
+
+	auto p = dir->getPath();
+	if (p.size() == 0 || *p.crbegin() != L'\\')
+		p.push_back(L'\\');
+
+	this->path = p + name;
 }
 
 const string InvalidFile::getErrorDescription() const

@@ -49,11 +49,18 @@ InvalidDirectory::InvalidDirectory(
 }
 
 InvalidDirectory::InvalidDirectory(
-	const string& path,
+	const string& name,
 	shared_ptr<SystemParameters> sp,
 	shared_ptr<const Directory> dir)
-	: Directory(name, dir->getPath() + "\\" + name, sp, dir)
+	: Directory(sp, dir)
 {
+	this->name = name;
+
+	auto p = dir->getPath();
+	if (p.size() == 0 || *p.crbegin() != L'\\')
+		p.push_back(L'\\');
+
+	this->path = p + name;
 }
 
 const string InvalidDirectory::getErrorDescription() const
